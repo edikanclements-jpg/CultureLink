@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover Indian and Nigerian clothing and the boutiques behind each piece.">
+    <title>{% block title %}CultureLink{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='discover.css') }}">
+    <script src="{{ url_for('static', filename='ui.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    {% set endpoint = request.endpoint or '' %}
+    <header class="site-header">
+        <a class="wordmark" href="{{ url_for('main.home') }}">CultureLink</a>
+        <nav aria-label="Main navigation">
+            <a href="{{ url_for('main.home') }}"{% if endpoint == 'main.home' %} aria-current="page"{% endif %}>Home</a>
+            <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') %} aria-current="page"{% endif %}>Discover</a>
+            <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
+        </nav>
+    </header>
+    <main id="main-content" class="page {% block page_class %}{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div><a class="footer-wordmark" href="{{ url_for('main.home') }}">CultureLink</a><p>Connecting cultures through fashion.</p></div>
+        <p class="hint">Student demonstration catalog. Confirm prices, sizing, and availability with each seller.</p>
+    </footer>
+</body>
+</html>

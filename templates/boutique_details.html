@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_card %}
+{% block title %}{{ boutique.boutique_name }} | CultureLink{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('boutiques.boutique_directory') }}">Sellers</a><span aria-hidden="true">/</span><span>{{ boutique.boutique_name }}</span></nav>
+<section class="seller-profile" data-boutique-id="{{ boutique.boutique_id }}" aria-labelledby="seller-heading">
+    <div class="seller-profile-header">
+        <div><p class="eyebrow">{{ boutique.cultures|join(' · ') or 'CULTURELINK BOUTIQUE' }}</p><h1 id="seller-heading">{{ boutique.boutique_name }}</h1><p class="seller-profile-location">{{ boutique.location or 'Location not provided' }}</p></div>
+        <div class="seller-profile-actions">
+            {% if boutique.website_url %}<a class="button secondary-button" href="{{ boutique.website_url }}" target="_blank" rel="noopener noreferrer">Visit website <span aria-hidden="true">↗</span></a>{% endif %}
+            {% if boutique.social_url %}<a class="button secondary-button" href="{{ boutique.social_url }}" target="_blank" rel="noopener noreferrer">Visit social page <span aria-hidden="true">↗</span></a>{% endif %}
+            {% if not boutique.website_url and not boutique.social_url %}<p class="hint muted">Storefront link not provided.</p>{% endif %}
+        </div>
+    </div>
+    {% if boutique.description %}<p class="seller-description">{{ boutique.description }}</p>{% endif %}
+    <dl class="seller-facts">
+        <div><dt>Cultures in this catalog</dt><dd>{{ boutique.cultures|join(', ') or 'Not provided' }}</dd></div>
+        <div><dt>Occasions listed</dt><dd>{{ boutique.occasions|join(', ') or 'Not provided' }}</dd></div>
+        <div><dt>Clothing types</dt><dd>{{ boutique.clothing_types|join(', ') or 'Not provided' }}</dd></div>
+        <div><dt>Catalog prices</dt><dd>{{ boutique.price_ranges|join(' · ') or 'Price to be determined' }}</dd></div>
+    </dl>
+    <details class="info-accordion seller-delivery"><summary>Production, shipping &amp; alterations</summary><p>These details have not been provided. Confirm them directly with the seller before making a purchase.</p></details>
+</section>
+<section class="seller-collection" aria-labelledby="collection-heading">
+    <div class="section-heading"><h2 id="collection-heading">From this seller</h2><p class="result-count" role="status">{{ products|length }} {{ 'piece' if products|length == 1 else 'pieces' }}</p></div>
+    {% if products %}<div class="product-grid seller-products">{% for product in products %}{{ product_card(product, heading='h3') }}{% endfor %}</div>{% else %}<div class="empty-state"><h3>No pieces listed yet</h3><p>Explore the rest of the catalog while this seller's collection is being added.</p><a class="button" href="{{ url_for('products.product_catalog') }}">Discover pieces</a></div>{% endif %}
+</section>
+{% endblock %}

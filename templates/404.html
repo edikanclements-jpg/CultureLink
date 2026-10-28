@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Page not found | CultureLink{% endblock %}
+{% block content %}
+<div class="empty-state not-found"><p class="eyebrow">PAGE NOT FOUND</p><h1>Let's find your next piece.</h1><p>This page is unavailable. You can continue exploring the catalog or browse our sellers.</p><div class="detail-actions"><a class="button" href="{{ url_for('products.product_catalog') }}">Discover pieces</a><a class="button secondary-button" href="{{ url_for('boutiques.boutique_directory') }}">Browse sellers</a></div></div>
+{% endblock %}

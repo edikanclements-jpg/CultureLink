@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% from '_components.html' import seller_card %}
+{% block title %}Sellers | CultureLink{% endblock %}
+{% block content %}
+<div class="intro directory-intro"><p class="eyebrow">THE BOUTIQUES BEHIND THE PIECES</p><h1>Sellers</h1><p>Explore the Indian and Nigerian boutiques in our catalog.</p></div>
+<form class="seller-search" method="get" action="{{ url_for('boutiques.boutique_directory') }}">
+    <div class="field"><label for="seller-keyword">Search sellers</label><input id="seller-keyword" name="keyword" type="search" value="{{ keyword }}" placeholder="Search by boutique, culture, or location"></div>
+    <div class="field"><label for="seller-culture">Culture</label><select id="seller-culture" name="culture"><option value="">Any culture</option>{% for value in cultures %}<option value="{{ value }}"{% if culture == value %} selected{% endif %}>{{ value }}</option>{% endfor %}</select></div>
+    <button type="submit">Find sellers</button><a class="clear-link" href="{{ url_for('boutiques.boutique_directory') }}">Clear filters</a>
+</form>
+<p class="result-count directory-count" role="status"><strong>{{ boutiques|length }}</strong> {{ 'seller' if boutiques|length == 1 else 'sellers' }}</p>
+{% if boutiques %}
+<div class="seller-grid">{% for boutique in boutiques %}{{ seller_card(boutique) }}{% endfor %}</div>
+{% else %}
+<div class="empty-state"><h2>No sellers found</h2><p>Try another name, culture, or location.</p><a class="button" href="{{ url_for('boutiques.boutique_directory') }}">Clear filters</a></div>
+{% endif %}
+{% endblock %}

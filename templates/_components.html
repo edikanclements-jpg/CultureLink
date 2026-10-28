@@ -1,0 +1,42 @@
+{% macro product_image(product, eager=false) -%}
+<div class="photo-frame">
+    {% if product and product.image_url %}
+    <img src="{{ product.image_url if product.image_url.startswith('https://') or product.image_url.startswith('http://') else url_for('static', filename='images/' ~ product.image_url) }}"
+         alt="{{ product.product_name }}" loading="{{ 'eager' if eager else 'lazy' }}"
+         onerror="this.hidden=true;this.parentElement.querySelector('.image-placeholder').hidden=false;">
+    {% endif %}
+    <div class="image-placeholder"{% if product and product.image_url %} hidden{% endif %}>Image unavailable</div>
+</div>
+{%- endmacro %}
+
+{% macro product_card(product, heading='h2') -%}
+<article class="product-card" data-product-id="{{ product.product_id }}" data-seller-id="{{ product.boutique_id }}">
+    <a class="photo-link" href="{{ url_for('products.product_details', product_id=product.product_id) }}" aria-label="View {{ product.product_name }}">{{ product_image(product) }}</a>
+    <div class="product-info">
+        <p class="culture-tag">{{ product.culture }}</p>
+        <{{ heading }} class="product-title"><a href="{{ url_for('products.product_details', product_id=product.product_id) }}">{{ product.product_name }}</a></{{ heading }}>
+        <p class="seller">By <a href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">{{ product.boutique_name }}</a></p>
+        <p class="price">{{ product.display_price }}</p>
+        <dl>
+            <div><dt>Occasion</dt><dd>{{ product.occasion or 'Not provided' }}</dd></div>
+            <div><dt>Color</dt><dd>{{ product.color or 'Not provided' }}</dd></div>
+            <div><dt>Size</dt><dd>{{ product.display_size }}</dd></div>
+            <div><dt>Location</dt><dd>{{ product.seller_location or 'Not provided' }}</dd></div>
+        </dl>
+        <a class="text-link" href="{{ url_for('products.product_details', product_id=product.product_id) }}">View piece <span aria-hidden="true">→</span></a>
+    </div>
+</article>
+{%- endmacro %}
+
+{% macro seller_card(boutique, heading='h2') -%}
+<article class="seller-card" data-boutique-id="{{ boutique.boutique_id }}">
+    <a class="photo-link" href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}" aria-label="View {{ boutique.boutique_name }}">{{ product_image(boutique.cover_product) }}</a>
+    <div class="product-info">
+        <p class="culture-tag">{{ boutique.cultures|join(' · ') or 'Culture not provided' }}</p>
+        <{{ heading }} class="product-title"><a href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}">{{ boutique.boutique_name }}</a></{{ heading }}>
+        <p class="seller-location">{{ boutique.location or 'Location not provided' }}</p>
+        <p class="hint">{{ boutique.product_count }} {{ 'piece' if boutique.product_count == 1 else 'pieces' }} in this catalog</p>
+        <a class="text-link" href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}">View seller <span aria-hidden="true">→</span></a>
+    </div>
+</article>
+{%- endmacro %}

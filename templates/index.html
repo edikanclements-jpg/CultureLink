@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_image, product_card, seller_card %}
+{% block title %}CultureLink | Culture, styled your way{% endblock %}
+{% block page_class %}home-page{% endblock %}
+{% block content %}
+<section class="home-hero" aria-labelledby="home-heading">
+    <div class="hero-copy">
+        <p class="eyebrow">INDIAN &amp; NIGERIAN FASHION</p>
+        <h1 id="home-heading">Culture,<br>styled your way.</h1>
+        <p class="hero-description">Discover cultural clothing. Find the pieces that feel like you, and the boutiques behind them.</p>
+        <a class="button hero-button" href="{{ url_for('products.product_catalog') }}">Explore pieces <span aria-hidden="true">→</span></a>
+        <p class="hero-counts">{{ boutiques|length }} boutiques <span aria-hidden="true">·</span> {{ products|length }} pieces <span aria-hidden="true">·</span> {{ cultures|length }} cultures</p>
+    </div>
+    {% if hero_product %}
+    <a class="hero-photo" href="{{ url_for('products.product_details', product_id=hero_product.product_id) }}" aria-label="View {{ hero_product.product_name }}">
+        {{ product_image(hero_product, eager=true) }}
+        <div class="hero-caption"><span>{{ hero_product.culture }} · {{ hero_product.boutique_name }}</span><strong>{{ hero_product.product_name }}</strong></div>
+    </a>
+    {% endif %}
+</section>
+
+<section class="culture-shortcuts" id="cultures" aria-labelledby="cultures-heading">
+    <h2 id="cultures-heading">Explore by culture</h2>
+    {% for culture in cultures %}
+    <a href="{{ url_for('products.product_catalog', culture=culture) }}">{{ culture }} <span aria-hidden="true">→</span></a>
+    {% endfor %}
+</section>
+
+<section class="find-section" aria-labelledby="find-heading">
+    <div><p class="eyebrow">DRESS FOR THE MOMENT</p><h2 id="find-heading">What are you dressing for?</h2></div>
+    <form class="home-search" method="get" action="{{ url_for('products.product_catalog') }}">
+        <div class="field"><label for="home-culture">Culture</label><select id="home-culture" name="culture"><option value="">Any culture</option>{% for culture in cultures %}<option value="{{ culture }}">{{ culture }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="home-occasion">Occasion</label><select id="home-occasion" name="occasion"><option value="">Any occasion</option>{% for occasion in occasions %}<option value="{{ occasion }}">{{ occasion }}</option>{% endfor %}</select></div>
+        <button type="submit">Find pieces <span aria-hidden="true">→</span></button>
+    </form>
+</section>
+
+<section class="home-section" id="products" aria-labelledby="featured-heading">
+    <div class="section-heading"><div><p class="eyebrow">A PIECE FROM EACH BOUTIQUE</p><h2 id="featured-heading">Featured pieces</h2></div><a class="text-link" href="{{ url_for('products.product_catalog') }}">Explore all {{ products|length }} pieces <span aria-hidden="true">→</span></a></div>
+    {% if featured %}<div class="product-grid featured-grid">{% for product in featured %}{{ product_card(product, heading='h3') }}{% endfor %}</div>{% else %}<p>There are no pieces in the catalog yet.</p>{% endif %}
+</section>
+
+<section class="home-section" id="marketplace" aria-labelledby="sellers-heading">
+    <div class="section-heading"><div><p class="eyebrow">MEET THE BOUTIQUES</p><h2 id="sellers-heading">The sellers behind the pieces</h2></div><a class="text-link" href="{{ url_for('boutiques.boutique_directory') }}">Browse sellers <span aria-hidden="true">→</span></a></div>
+    <div class="seller-grid">{% for boutique in boutiques %}{{ seller_card(boutique, heading='h3') }}{% endfor %}</div>
+</section>
+{% endblock %}

@@ -1,0 +1,307 @@
+
+/* CULTURELINK GLOBAL STYLES */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #242424;
+    background: #faf8f5;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+}
+
+/* NAVIGATION */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 8%;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #854d35;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+}
+
+nav a {
+    color: #333;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: #854d35;
+}
+
+/* HERO SECTION */
+
+.hero {
+    text-align: center;
+    padding: 110px 20px;
+    background: #f0e3d5;
+}
+
+.eyebrow {
+    color: #854d35;
+    font-size: 13px;
+    letter-spacing: 3px;
+    font-weight: bold;
+}
+
+.hero h1 {
+    max-width: 750px;
+    margin: 20px auto;
+    font-size: clamp(34px, 5vw, 58px);
+    line-height: 1.15;
+}
+
+.hero > p:not(.eyebrow) {
+    max-width: 550px;
+    margin: 0 auto 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 28px;
+    margin-top: 20px;
+    background: #854d35;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background: #633723;
+}
+
+/* CULTURAL CATEGORIES */
+
+.cultures,
+.about {
+    text-align: center;
+    padding: 80px 8%;
+}
+
+.cultures h2,
+.about h2 {
+    font-size: 34px;
+    margin-bottom: 12px;
+}
+
+.culture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    max-width: 1000px;
+    margin: 40px auto 0;
+}
+
+.culture-card {
+    padding: 55px 25px;
+    background: white;
+    border: 1px solid #eaded4;
+    border-radius: 12px;
+}
+
+.culture-card h3 {
+    font-size: 26px;
+    color: #854d35;
+}
+
+.culture-card span {
+    display: inline-block;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* MARKETPLACE */
+
+.marketplace {
+    padding: 80px 8%;
+    text-align: center;
+    background: #faf8f5;
+}
+
+.marketplace h2 {
+    font-size: 34px;
+    margin-bottom: 15px;
+}
+
+.marketplace > p {
+    margin-bottom: 30px;
+}
+
+/* BOUTIQUE CARDS */
+
+.boutique-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.boutique-card {
+    background: white;
+    padding: 35px 25px;
+    border-radius: 12px;
+    border: 1px solid #eaded4;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.boutique-card h3 {
+    color: #854d35;
+    font-size: 21px;
+    margin-bottom: 12px;
+}
+
+.boutique-card a {
+    display: inline-block;
+    margin-top: 15px;
+    color: #854d35;
+    font-weight: bold;
+}
+
+.boutique-card a:hover {
+    color: #633723;
+}
+
+/* PRODUCT CARDS */
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 25px;
+    margin-top: 35px;
+    text-align: left;
+}
+
+.product-card {
+    background: white;
+    border: 1px solid #eaded4;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.product-card img {
+    display: block;
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    height: 250px;
+    padding: 15px;
+    background: #eee5dd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #846f60;
+    text-align: center;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-info h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #854d35;
+}
+
+.product-info p {
+    font-size: 14px;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+}
+
+.product-info strong {
+    font-weight: bold;
+}
+
+/* ABOUT AND FOOTER */
+
+.about {
+    background: #f5ede6;
+}
+
+.about p {
+    max-width: 650px;
+    margin: auto;
+}
+
+footer {
+    padding: 25px;
+    text-align: center;
+    background: #282321;
+    color: white;
+}
+
+footer p {
+    margin-bottom: 6px;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+    .boutique-grid,
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav {
+        justify-content: center;
+        gap: 14px;
+        font-size: 14px;
+    }
+
+    .hero {
+        padding: 75px 20px;
+    }
+
+    .cultures,
+    .about,
+    .marketplace {
+        padding: 55px 5%;
+    }
+
+    .culture-grid,
+    .boutique-grid,
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+}
