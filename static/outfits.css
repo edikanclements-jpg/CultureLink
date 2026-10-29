@@ -1,0 +1,119 @@
+.closet-tabs { display: flex; gap: 30px; margin: 0 0 30px; border-bottom: 1px solid rgba(79,3,1,.24); font-size: 17px; }
+.closet-tabs a { padding: 15px 0 12px; text-decoration: none; }
+.closet-tabs a[aria-current] { border-bottom: 2px solid var(--burgundy); font-weight: bold; }
+.outfit-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 24px; padding: 16px 0 29px; }
+.outfit-heading > div { max-width: 850px; min-width: 0; }
+.outfit-heading .eyebrow { margin: 0 0 14px; }
+.outfit-heading h1 { overflow-wrap: anywhere; }
+.outfit-heading p:not(.eyebrow) { font-size: 21px; margin-bottom: 0; overflow-wrap: anywhere; }
+.outfit-heading > a { font-size: 16px; }
+.outfit-heading > .button { border-radius: 7px; display: inline-flex; align-items: center; gap: 28px; }
+.outfit-welcome { max-width: 850px; margin: 45px auto 25px; text-align: center; background: #fff0d7; border: 1px solid rgba(79,3,1,.2); border-radius: 18px; padding: 55px 35px 35px; }
+.outfit-welcome-mark { width: 85px; height: 85px; border: 1px solid rgba(79,3,1,.25); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 26px; }
+.outfit-welcome-mark svg { width: 55px; height: 55px; fill: none; stroke: var(--burgundy); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.outfit-welcome h2 { margin: 12px 0 15px; font-size: clamp(34px,3.8vw,48px); line-height: 1.05; }
+.outfit-welcome p:not(.eyebrow) { max-width: 470px; margin: 18px auto 24px; font-size: 19px; }
+.outfit-welcome .outfit-quiet { font-size: 14px !important; margin-bottom: 0 !important; }
+.outfit-gallery { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 25px; }
+.outfit-list-count { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 17px; margin: 4px 0 23px; }
+.outfit-list-count span { font-size: 15px; }
+.outfit-card { border: 1px solid rgba(79,3,1,.23); border-radius: 12px; overflow: hidden; background: #fff0d7; min-width: 0; transition: transform .22s ease, box-shadow .22s ease; }
+.outfit-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(60,20,10,.1); }
+.outfit-card-link { display: block; text-decoration: none; height: 100%; }
+.outfit-card-copy { padding: 23px; }
+.outfit-card-copy .eyebrow { font-size: 11px; overflow-wrap: anywhere; }
+.outfit-card-copy h2 { font-size: 32px; line-height: 1.08; margin: 10px 0 16px; overflow-wrap: anywhere; }
+.outfit-card-copy p:last-child { font-size: 15px; margin: 0; }
+.outfit-montage { height: 285px; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 3px; background: #ead3b2; overflow: hidden; }
+.outfit-montage > .photo-frame { aspect-ratio: auto; min-height: 0; height: 100%; }
+.outfit-montage .image-placeholder { font-size: 14px; padding: 10px; }
+.outfit-montage-1 { grid-template-columns: 1fr; }
+.outfit-montage-3, .outfit-montage-4 { grid-template-rows: repeat(2,minmax(0,1fr)); }
+.outfit-montage-3 > :first-child { grid-row: span 2; }
+.outfit-montage-0 { place-items: center; grid-template-columns: 1fr; text-align: center; padding: 30px; }
+.outfit-editor, .outfit-detail-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; align-items: start; gap: 35px; }
+.outfit-picker, .outfit-detail-layout > section { min-width: 0; }
+.outfit-picker-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.outfit-picker-heading .eyebrow { font-size: 11px; margin: 0 0 8px; }
+.outfit-picker-heading h2 { font-size: 33px; line-height: 1.1; margin: 0; }
+.outfit-picker-heading > p { font-size: 14px; margin: 0 0 3px; }
+.outfit-help { font-size: 15px; line-height: 1.45; margin: 12px 0 22px; }
+.outfit-piece-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px 17px; }
+.outfit-choice { min-width: 0; position: relative; }
+.outfit-choice > input { position: absolute; left: 10px; top: 10px; width: 26px; height: 26px; min-height: 0; z-index: 1; margin: 0; opacity: 0; }
+.outfit-piece-label { display: block; border: 2px solid rgba(79,3,1,.18); border-radius: 10px; overflow: hidden; background: #ffe6bf; cursor: pointer; height: calc(100% - 35px); transition: border-color .18s ease, background .18s ease; }
+.outfit-choice > input:focus-visible + label { outline: 3px solid var(--burgundy); outline-offset: 4px; }
+.outfit-choice > input:checked + label { border-color: var(--burgundy); background: #fff1dc; }
+.outfit-choice > input:disabled + label { opacity: .58; cursor: not-allowed; }
+.outfit-choice > input:checked + label .outfit-check { background: var(--burgundy); color: var(--cream); }
+.outfit-check::before { content: '+'; }
+.outfit-choice > input:checked + label .outfit-check::before { content: '✓'; }
+.outfit-piece-photo { position: relative; }
+.outfit-piece-photo .photo-frame { aspect-ratio: 4/5; }
+.outfit-check { position: absolute; right: 10px; top: 10px; display: grid; place-items: center; width: 29px; height: 29px; border-radius: 50%; background: #fff1dc; color: var(--burgundy); border: 1px solid var(--burgundy); font-size: 20px; line-height: 1; }
+.outfit-piece-copy { display: flex; flex-direction: column; padding: 14px 13px 16px; gap: 7px; font-size: 13px; overflow-wrap: anywhere; }
+.outfit-piece-copy strong { font-family: 'Cormorant Garamond','Times New Roman',serif; font-size: 23px; line-height: 1.08; font-weight: 600; }
+.outfit-piece-price { font-weight: bold; font-size: 14px; }
+.outfit-piece-details { min-height: 35px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding: 8px 3px 0; }
+.outfit-retained { font-size: 12px; font-style: italic; }
+.outfit-studio { position: sticky; top: 25px; min-width: 0; border: 1px solid rgba(79,3,1,.23); border-radius: 14px; padding: 24px; background: #fff0d7; }
+.outfit-review-link { display: none; }
+#outfit-studio { scroll-margin-top: 25px; }
+.outfit-studio > .eyebrow { font-size: 11px; margin-top: 0; }
+.outfit-studio h2 { font-size: 36px; line-height: 1.1; margin: 10px 0 22px; }
+.outfit-live-preview { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px; margin-bottom: 24px; }
+.outfit-live-preview .photo-frame { border-radius: 4px; overflow: hidden; animation: outfit-appear .22s ease both; }
+.outfit-live-preview .image-placeholder { font-size: 9px; padding: 3px; }
+.outfit-preview-empty { padding: 20px 15px; border: 1px dashed rgba(79,3,1,.28); border-radius: 7px; text-align: center; font-size: 15px; }
+.outfit-field { margin-top: 18px; }
+.outfit-field label { display: block; font-size: 16px; margin-bottom: 6px; }
+.outfit-field label span { font-size: 12px; }
+.outfit-field input, .outfit-field textarea { font: inherit; font-size: 16px; width: 100%; border: 1px solid rgba(79,3,1,.35); border-radius: 6px; color: var(--burgundy); background: #fff8ed; padding: 10px 12px; }
+.outfit-field textarea { resize: vertical; min-height: 95px; }
+.outfit-field textarea:focus-visible { outline: 3px solid var(--burgundy); outline-offset: 3px; }
+.outfit-field ::placeholder { color: #795341; opacity: 1; font-size: 14px; }
+.outfit-save { width: 100%; border-radius: 6px; font-size: 16px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.outfit-save:disabled { opacity: .5; cursor: not-allowed; }
+.outfit-save-hint { font-size: 13px; margin: 10px 0; }
+.outfit-cancel { display: block; text-align: center; padding: 13px 0 0; font-size: 14px; }
+.outfit-picker-empty { border: 1px dashed rgba(79,3,1,.3); padding: 35px 25px; text-align: center; background: #f3dfbf; border-radius: 12px; }
+.outfit-picker-empty h3 { font-size: 31px; line-height: 1.1; margin: 0; }
+.outfit-picker-empty p { font-size: 17px; }
+.outfit-detail-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 25px; margin-top: 22px; }
+.outfit-detail-piece { min-width: 0; overflow: hidden; background: #ffe6bf; border: 1px solid rgba(79,3,1,.2); border-radius: 10px; }
+.outfit-detail-piece > a { display: block; }
+.outfit-detail-piece > div { padding: 19px; }
+.outfit-detail-piece h3 { font-size: 28px; line-height: 1.1; margin: 10px 0 14px; overflow-wrap: anywhere; }
+.outfit-detail-piece h3 a { text-decoration: none; }
+.outfit-detail-piece p { font-size: 15px; margin: 12px 0; overflow-wrap: anywhere; }
+.outfit-notes { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 18px; }
+.outfit-delete { border-top: 1px solid rgba(79,3,1,.2); margin-top: 25px; padding-top: 20px; }
+.outfit-delete summary { font: inherit; font-size: 14px; cursor: pointer; }
+.outfit-delete p { font-size: 14px; }
+.outfit-delete button { font-size: 14px; border-radius: 5px; }
+.outfit-errors { border: 2px solid var(--burgundy); border-radius: 10px; padding: 18px 24px; margin-bottom: 27px; background: #fff0d7; }
+.outfit-errors h2 { font-size: 29px; margin: 0; }
+.outfit-errors ul { font-size: 16px; padding-left: 20px; margin-bottom: 0; }
+@keyframes outfit-appear { from { opacity: .4; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@media (max-width: 1100px) { .outfit-piece-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .outfit-editor, .outfit-detail-layout { gap: 25px; grid-template-columns: minmax(0,1fr) 290px; } }
+@media (max-width: 800px) { .outfit-editor, .outfit-detail-layout { grid-template-columns: 1fr; } .outfit-studio { position: static; } .outfit-piece-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } .outfit-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } .outfit-live-preview { grid-template-columns: repeat(8,minmax(0,1fr)); } .outfit-review-link { display: inline-flex; align-items: center; gap: 18px; font-size: 15px; margin: -5px 0 23px; min-height: 35px; } }
+@media (max-width: 560px) {
+    .outfit-heading { padding-top: 0; gap: 18px; }
+    .outfit-heading h1 { font-size: 49px; }
+    .outfit-heading p:not(.eyebrow) { font-size: 19px; }
+    .closet-tabs { font-size: 16px; gap: 26px; margin-bottom: 24px; }
+    .outfit-gallery { grid-template-columns: 1fr; }
+    .outfit-welcome { padding: 35px 22px 28px; margin-top: 25px; }
+    .outfit-welcome p:not(.eyebrow) { font-size: 17px; }
+    .outfit-piece-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px 12px; }
+    .outfit-piece-copy { padding: 12px 10px; font-size: 12px; }
+    .outfit-piece-copy strong { font-size: 21px; }
+    .outfit-piece-copy .culture-tag { font-size: 10px; }
+    .outfit-piece-price { font-size: 12px; }
+    .outfit-check { width: 26px; height: 26px; right: 7px; top: 7px; }
+    .outfit-picker-heading h2 { font-size: 31px; }
+    .outfit-studio { padding: 22px; }
+    .outfit-detail-grid { grid-template-columns: 1fr; }
+    .outfit-live-preview { grid-template-columns: repeat(4,minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .outfit-card, .outfit-piece-label { transition: none; } .outfit-live-preview .photo-frame { animation: none; } }

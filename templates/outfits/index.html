@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_image with context %}
+{% from 'outfits/_shared.html' import tabs %}
+{% block title %}Outfit Planner | CultureLink{% endblock %}
+{% block page_class %}outfit-page{% endblock %}
+{% block content %}
+<header class="outfit-heading"><div><p class="eyebrow">PIECES WITH POSSIBILITY</p><h1>A look of your own.</h1><p>Bring your favorites together. Keep the looks you love.</p></div>{% if not problem %}<a class="button" href="{{ url_for('closet.outfit_new') }}">Create an outfit <span aria-hidden="true">+</span></a>{% endif %}</header>
+{{ tabs('outfits') }}
+{% if problem %}
+<section class="closet-empty" role="alert"><h2>Let's try that again.</h2><p>{{ problem }}</p><a class="button" href="{{ url_for('closet.outfits') }}">Try again</a> <a class="text-link" href="{{ url_for('closet.index') }}">Open my Closet</a></section>
+{% elif not outfits %}
+<section class="outfit-welcome"><div class="outfit-welcome-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 13a7 7 0 0 1 7 7c0 4-7 5-7 10v3M32 33 9 46c-3 2-2 5 2 5h42c4 0 5-3 2-5L32 33Z"/><path d="m48 9 1.5 4.5L54 15l-4.5 1.5L48 21l-1.5-4.5L42 15l4.5-1.5Z"/></svg></div><p class="eyebrow">YOUR NEXT LOOK STARTS HERE</p><h2>One piece. So many possibilities.</h2><p>Choose up to eight pieces from your saved Closet, give your outfit a name, and keep a little inspiration for later.</p><a class="button" href="{{ url_for('closet.outfit_new') }}">Plan my first outfit <span aria-hidden="true">&rarr;</span></a><p class="outfit-quiet">Your outfits are private to your buyer account.</p></section>
+{% else %}
+<p class="outfit-list-count">{{ outfits|length }} saved {{ 'outfit' if outfits|length == 1 else 'outfits' }} <span>Made by you. Ready for later.</span></p>
+<div class="outfit-gallery">
+{% for outfit in outfits %}
+<article class="outfit-card" data-outfit-id="{{ outfit.outfit_id }}">
+    <a class="outfit-card-link" href="{{ url_for('closet.outfit_detail', outfit_id=outfit.outfit_id) }}">
+        <div class="outfit-montage outfit-montage-{{ [outfit.products|length, 4]|min }}" aria-hidden="true">{% for product in outfit.products[:4] %}{{ product_image(product) }}{% else %}<span>Pieces no longer available</span>{% endfor %}</div>
+        <div class="outfit-card-copy"><p class="eyebrow">{{ outfit.occasion or 'YOUR OWN OCCASION' }}</p><h2>{{ outfit.name }}</h2><p>{{ outfit.products|length }} {{ 'piece' if outfit.products|length == 1 else 'pieces' }}<span aria-hidden="true"> &middot; </span><span>View outfit &rarr;</span></p></div>
+    </a>
+</article>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

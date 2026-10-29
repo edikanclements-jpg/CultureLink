@@ -1,0 +1,6 @@
+{% macro tabs(active) -%}
+<nav class="closet-tabs" aria-label="Closet sections">
+    <a href="{{ url_for('closet.index') }}"{% if active == 'pieces' %} aria-current="page"{% endif %}>Saved pieces</a>
+    <a href="{{ url_for('closet.outfits') }}"{% if active == 'outfits' %} aria-current="page"{% endif %}>Outfit planner</a>
+</nav>
+{%- endmacro %}

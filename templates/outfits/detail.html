@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_image with context %}
+{% from 'outfits/_shared.html' import tabs %}
+{% block title %}{{ outfit.name }} | My Outfits | CultureLink{% endblock %}
+{% block page_class %}outfit-page{% endblock %}
+{% block content %}
+<header class="outfit-heading"><div><p class="eyebrow">A LOOK OF YOUR OWN</p><h1>{{ outfit.name }}</h1><p>{{ outfit.occasion or 'For wherever the day takes you.' }}</p></div><a class="button secondary-button" href="{{ url_for('closet.outfits') }}">All my outfits <span aria-hidden="true">&rarr;</span></a></header>
+{{ tabs('outfits') }}
+<div class="outfit-detail-layout">
+<section aria-labelledby="outfit-pieces-title"><div class="outfit-picker-heading"><h2 id="outfit-pieces-title">The pieces.</h2><p>{{ outfit.products|length }} {{ 'piece' if outfit.products|length == 1 else 'pieces' }}</p></div>
+{% if outfit.products %}<div class="outfit-detail-grid">
+{% for product in outfit.products %}<article class="outfit-detail-piece" data-outfit-piece="{{ product.product_id }}"><a href="{{ url_for('products.product_details', product_id=product.product_id) }}" aria-label="View {{ product.product_name }}">{{ product_image(product) }}</a><div><p class="culture-tag">{{ product.culture }}</p><h3><a href="{{ url_for('products.product_details', product_id=product.product_id) }}">{{ product.product_name }}</a></h3><p>By <a href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">{{ product.boutique_name }}</a></p><p class="outfit-piece-price">{{ product.display_price }}</p><p class="outfit-help">{{ product.color or 'Color not provided' }} &middot; {{ product.display_size }}</p></div></article>{% endfor %}
+</div>{% else %}<div class="outfit-picker-empty"><h3>Time for a fresh take.</h3><p>The catalog pieces in this outfit are no longer available. You can still edit its name and choose new pieces from your Closet.</p><a class="button" href="{{ url_for('closet.outfit_edit', outfit_id=outfit.outfit_id) }}">Choose new pieces</a></div>{% endif %}
+</section>
+<aside class="outfit-studio outfit-detail-notes"><p class="eyebrow">THE FINISHING TOUCHES</p><h2>Your notes.</h2><p class="outfit-notes">{{ outfit.notes or 'A little inspiration, ready for whenever you need it. Add styling ideas or accessories by editing your outfit.' }}</p><p class="outfit-help">Saved {{ (outfit.created_at|string)[:10] }}. Private to your account.</p><a class="button outfit-save" href="{{ url_for('closet.outfit_edit', outfit_id=outfit.outfit_id) }}">Edit outfit <span aria-hidden="true">&rarr;</span></a><a class="outfit-cancel" href="{{ url_for('closet.outfit_new') }}">Create another outfit</a>
+<details class="outfit-delete"><summary>Delete this outfit</summary><p>This deletes the outfit. Your saved Closet pieces stay saved.</p><form method="post" action="{{ url_for('closet.outfit_delete', outfit_id=outfit.outfit_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="version" value="{{ outfit.version }}"><button type="submit" name="confirm_delete" value="yes">Yes, delete outfit</button></form></details>
+</aside>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_image with context %}
+{% from 'outfits/_shared.html' import tabs %}
+{% block title %}{{ 'Edit' if outfit else 'Create' }} an Outfit | CultureLink{% endblock %}
+{% block page_class %}outfit-page{% endblock %}
+{% block content %}
+<header class="outfit-heading"><div><p class="eyebrow">YOUR CLOSET, REIMAGINED</p><h1>{{ 'Make it yours again.' if outfit else 'Piece it together.' }}</h1><p>Choose what belongs together. There are no rules here.</p></div><a class="text-link" href="{{ url_for('closet.outfit_detail', outfit_id=outfit.outfit_id) if outfit else url_for('closet.outfits') }}">{{ 'Back to outfit' if outfit else 'All my outfits' }} <span aria-hidden="true">&rarr;</span></a></header>
+{{ tabs('outfits') }}
+{% if errors %}<div class="outfit-errors" role="alert" tabindex="-1" data-outfit-errors><h2>Let's give that another look.</h2><ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" class="outfit-editor" data-outfit-editor data-max-pieces="{{ max_pieces }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="hidden" name="request_key" value="{{ request_key }}">
+{% if outfit %}<input type="hidden" name="version" value="{{ outfit.version }}">{% endif %}
+<section class="outfit-picker" aria-labelledby="outfit-picker-title">
+    <div class="outfit-picker-heading"><div><p class="eyebrow">01 / THE PIECES</p><h2 id="outfit-picker-title">Start with your favorites.</h2></div><p data-outfit-count aria-live="polite">{{ selected|length }} of {{ max_pieces }} selected</p></div>
+    <p class="outfit-help" id="outfit-picker-help">Choose 1 to {{ max_pieces }} pieces. Add more favorites through <a href="{{ url_for('products.product_catalog') }}">Discover</a> before starting a new outfit.</p>
+    <a class="outfit-review-link" href="#outfit-studio">Name and save your outfit <span aria-hidden="true">&darr;</span></a>
+    {% if choices %}
+    <div class="outfit-piece-grid">
+    {% for product in choices %}
+    <div class="outfit-choice">
+        <input type="checkbox" name="item_ids" value="{{ product.product_id }}" id="outfit-piece-{{ product.product_id }}"{% if product.product_id in selected %} checked{% endif %} aria-describedby="outfit-picker-help" data-piece-name="{{ product.product_name }}">
+        <label for="outfit-piece-{{ product.product_id }}" class="outfit-piece-label">
+            <div class="outfit-piece-photo">{{ product_image(product) }}<span class="outfit-check" aria-hidden="true"></span></div>
+            <span class="outfit-piece-copy"><span class="culture-tag">{{ product.culture }}</span><strong>{{ product.product_name }}</strong><span>{{ product.boutique_name }}</span><span class="outfit-piece-price">{{ product.display_price }}</span>{% if product.product_id not in saved_ids %}<span class="outfit-retained">Kept from this outfit</span>{% endif %}</span>
+        </label>
+        <a class="outfit-piece-details" href="{{ url_for('products.product_details', product_id=product.product_id) }}" target="_blank" rel="noopener" aria-label="View {{ product.product_name }} details in a new tab">Piece details <span aria-hidden="true">↗</span></a>
+    </div>
+    {% endfor %}
+    </div>
+    {% else %}<div class="outfit-picker-empty"><h3>A favorite makes a good beginning.</h3><p>Save a few pieces to your Closet, then come back to create your first outfit.</p><a class="button" href="{{ url_for('products.product_catalog') }}">Find pieces <span aria-hidden="true">&rarr;</span></a></div>{% endif %}
+</section>
+<aside class="outfit-studio" id="outfit-studio" aria-labelledby="outfit-studio-title">
+    <p class="eyebrow">02 / MAKE IT YOURS</p><h2 id="outfit-studio-title">Your outfit.</h2>
+    <div class="outfit-live-preview" data-outfit-preview aria-hidden="true" hidden></div>
+    <p class="outfit-preview-empty" data-outfit-preview-empty hidden>Your selected pieces will appear here.</p>
+    <div class="outfit-field"><label for="outfit-name">Outfit name <span>(required)</span></label><input type="text" name="name" id="outfit-name" value="{{ values.name }}" maxlength="80" required placeholder="A little celebration" autocomplete="off"></div>
+    <div class="outfit-field"><label for="outfit-occasion">Occasion <span>(optional)</span></label><input type="text" name="occasion" id="outfit-occasion" value="{{ values.occasion }}" maxlength="80" placeholder="Wedding guest, dinner, just because" autocomplete="off"></div>
+    <div class="outfit-field"><label for="outfit-notes">Notes <span>(optional)</span></label><textarea name="notes" id="outfit-notes" rows="3" maxlength="500" placeholder="Accessories, styling ideas, little details...">{{ values.notes }}</textarea></div>
+    <p class="outfit-help">Private to your account. You can come back and edit this anytime.</p>
+    <button type="submit" class="outfit-save" data-outfit-save{% if not choices %} disabled{% endif %}>{{ 'Save changes' if outfit else 'Save outfit' }} <span aria-hidden="true">&rarr;</span></button>
+    <p class="outfit-save-hint" data-outfit-save-hint hidden></p>
+    <a class="outfit-cancel" href="{{ url_for('closet.outfit_detail', outfit_id=outfit.outfit_id) if outfit else url_for('closet.outfits') }}">Cancel</a>
+</aside>
+</form>
+{% endblock %}

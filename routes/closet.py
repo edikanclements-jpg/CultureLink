@@ -5,10 +5,11 @@ import re
 import secrets
 from urllib.parse import unquote, urlsplit, urlunsplit
 
-from flask import Blueprint, current_app, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, current_app, flash, g, jsonify, redirect, render_template, request, session, url_for
 from mysql.connector import Error
 from services.closet import ClosetAccessError, ClosetItemNotFound, saved_item_ids, saved_products, set_saved
 from services.comparison import ComparisonItemError, ComparisonLimitError, change_selection, selection_ids
+from services import outfits as outfit_service
 
 closet_bp = Blueprint("closet", __name__)
 
@@ -191,3 +192,142 @@ def compare_remove(product_id):
 @buyer_required
 def compare_clear():
     return _comparison_change()
+
+
+def _outfit_problem():
+    current_app.logger.warning("Could not open the current buyer's outfit planner.")
+    return render_template("outfits/index.html", outfits=[], problem="We couldn't open your outfit planner right now. Your saved pieces are still in your Closet. Please try again in a moment."), 503
+
+
+def _positive_integer(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[1-9][0-9]{0,9}", value):
+        return None
+    number = int(value)
+    return number if number <= 4294967295 else None
+
+
+@closet_bp.route("/closet/outfits")
+@buyer_required
+def outfits():
+    try:
+        looks = outfit_service.list_outfits(g.user["user_id"])
+    except Error:
+        return _outfit_problem()
+    return render_template("outfits/index.html", outfits=looks, problem=None)
+
+
+@closet_bp.route("/closet/outfits/<int:outfit_id>")
+@buyer_required
+def outfit_detail(outfit_id):
+    try:
+        outfit = outfit_service.get_outfit(g.user["user_id"], outfit_id)
+    except outfit_service.OutfitNotFound:
+        abort(404)
+    except Error:
+        return _outfit_problem()
+    return render_template("outfits/detail.html", outfit=outfit, problem=None)
+
+
+def _outfit_editor(outfit_id=None):
+    try:
+        outfit = outfit_service.get_outfit(g.user["user_id"], outfit_id) if outfit_id is not None else None
+        outfit_service.ensure_schema()
+        saved = saved_products(g.user["user_id"])
+    except outfit_service.OutfitNotFound:
+        abort(404)
+    except Error:
+        return _outfit_problem()
+    saved_ids = {piece["product_id"] for piece in saved}
+    choices = {piece["product_id"]: piece for piece in (outfit["products"] if outfit else [])}
+    choices.update({piece["product_id"]: piece for piece in saved})
+    values = {key: outfit[key] if outfit else "" for key in ("name", "occasion", "notes")}
+    selected = [piece["product_id"] for piece in outfit["products"]] if outfit else []
+    request_key = secrets.token_hex(16)
+    errors, status = [], 200
+    if request.method == "POST":
+        values = {key: request.form.get(key, "").strip() for key in values}
+        for key, maximum, label in (("name", 80, "Outfit name"), ("occasion", 80, "Occasion"), ("notes", 500, "Notes")):
+            if len(values[key]) > maximum or any((ord(char) < 32 and (key != "notes" or char not in "\t\n\r")) or ord(char) == 127 for char in values[key]):
+                errors.append(f"{label} must use normal text and no more than {maximum} characters.")
+        if not values["name"]:
+            errors.append("Give your outfit a name.")
+        submitted = request.form.getlist("item_ids")
+        parsed = [_positive_integer(value) for value in submitted]
+        selected = list(dict.fromkeys(value for value in parsed if value is not None))
+        if not 1 <= len(submitted) <= outfit_service.MAX_PIECES or None in parsed or len(selected) != len(submitted):
+            errors.append("Choose between 1 and 8 different pieces.")
+        request_key = request.form.get("request_key", "")
+        version = _positive_integer(request.form.get("version", ""))
+        if outfit is None and not re.fullmatch(r"[0-9a-f]{32}", request_key):
+            errors.append("This form is incomplete. Review your outfit and save again.")
+            request_key = secrets.token_hex(16)
+        if outfit is not None and version is None:
+            errors.append("This form is out of date. Review your outfit and save again.")
+        if not errors:
+            try:
+                saved_id = outfit_service.save_outfit(g.user["user_id"], values, selected, request_key, outfit_id, version)
+            except outfit_service.OutfitNotFound:
+                abort(404)
+            except outfit_service.OutfitSelectionError:
+                errors.append("A selected piece is no longer in your Closet. Choose your pieces again. Existing outfit pieces can still be kept.")
+                status = 409
+            except outfit_service.OutfitConflict:
+                errors.append("This outfit changed in another tab. Review your choices against the latest saved outfit before saving again.")
+                status = 409
+                try:
+                    outfit = outfit_service.get_outfit(g.user["user_id"], outfit_id)
+                    choices = {piece["product_id"]: piece for piece in outfit["products"]}
+                    choices.update({piece["product_id"]: piece for piece in saved})
+                except outfit_service.OutfitNotFound:
+                    abort(404)
+                except Error:
+                    return _outfit_problem()
+            except ClosetAccessError:
+                return _problem("The outfit planner is available with a buyer account.", 403)
+            except Error:
+                current_app.logger.warning("Could not save the current buyer's outfit.")
+                errors.append("We couldn't save your outfit. Your entries are still here. Please try again.")
+                status = 503
+            else:
+                flash("Outfit updated." if outfit else "Outfit saved. Make it yours whenever you're ready.", "success")
+                return redirect(url_for("closet.outfit_detail", outfit_id=saved_id), code=303)
+        if errors and status == 200:
+            status = 400
+    selected = [item_id for item_id in selected if item_id in choices]
+    return render_template("outfits/editor.html", outfit=outfit, values=values, choices=list(choices.values()), saved_ids=saved_ids,
+                           selected=selected, request_key=request_key, errors=errors, max_pieces=outfit_service.MAX_PIECES), status
+
+
+@closet_bp.route("/closet/outfits/new", methods=["GET", "POST"])
+@buyer_required
+def outfit_new():
+    return _outfit_editor()
+
+
+@closet_bp.route("/closet/outfits/<int:outfit_id>/edit", methods=["GET", "POST"])
+@buyer_required
+def outfit_edit(outfit_id):
+    return _outfit_editor(outfit_id)
+
+
+@closet_bp.route("/closet/outfits/<int:outfit_id>/delete", methods=["POST"])
+@buyer_required
+def outfit_delete(outfit_id):
+    version = _positive_integer(request.form.get("version", ""))
+    if version is None or request.form.get("confirm_delete") != "yes":
+        abort(400)
+    try:
+        outfit_service.delete_outfit(g.user["user_id"], outfit_id, version)
+    except outfit_service.OutfitNotFound:
+        abort(404)
+    except outfit_service.OutfitConflict:
+        flash("This outfit changed in another tab. Review the latest version before deleting it.", "info")
+        return redirect(url_for("closet.outfit_detail", outfit_id=outfit_id), code=303)
+    except ClosetAccessError:
+        return _problem("The outfit planner is available with a buyer account.", 403)
+    except Error:
+        current_app.logger.warning("Could not delete the current buyer's outfit.")
+        flash("We couldn't delete your outfit. Please try again.", "info")
+        return redirect(url_for("closet.outfit_detail", outfit_id=outfit_id), code=303)
+    flash("Outfit deleted. Your saved Closet pieces are still there.", "success")
+    return redirect(url_for("closet.outfits"), code=303)

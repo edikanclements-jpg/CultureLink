@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% from '_components.html' import product_card with context %}
+{% from 'outfits/_shared.html' import tabs %}
 {% block title %}Saved Closet | CultureLink{% endblock %}
 {% block page_class %}closet-page{% endblock %}
 {% block content %}
@@ -7,6 +8,7 @@
     <div><p class="eyebrow">A LITTLE MORE YOU</p><h1 id="closet-heading">Your saved closet.</h1><p>The pieces you love, all in one place.</p></div>
     <a class="button secondary-button" href="{{ url_for('products.product_catalog') }}">Discover more pieces <span aria-hidden="true">&rarr;</span></a>
 </section>
+{{ tabs('pieces') }}
 {% if problem %}
 <div class="closet-empty" role="alert"><h2>Let's try that again.</h2><p>{{ problem }}</p>{% if can_retry %}<a class="button" href="{{ url_for('closet.index') }}">Try again</a>{% else %}<a class="button" href="{{ url_for('products.product_catalog') }}">Explore Discover</a>{% endif %}</div>
 {% else %}
