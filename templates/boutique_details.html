@@ -14,12 +14,12 @@
     </div>
     {% if boutique.description %}<p class="seller-description">{{ boutique.description }}</p>{% endif %}
     <dl class="seller-facts">
-        <div><dt>Cultures in this catalog</dt><dd>{{ boutique.cultures|join(', ') or 'Not provided' }}</dd></div>
-        <div><dt>Occasions listed</dt><dd>{{ boutique.occasions|join(', ') or 'Not provided' }}</dd></div>
+        <div><dt>Cultures represented</dt><dd>{{ boutique.cultures|join(', ') or 'Not provided' }}</dd></div>
+        <div><dt>Occasions</dt><dd>{{ boutique.occasions|join(', ') or 'Not provided' }}</dd></div>
         <div><dt>Clothing types</dt><dd>{{ boutique.clothing_types|join(', ') or 'Not provided' }}</dd></div>
-        <div><dt>Catalog prices</dt><dd>{{ boutique.price_ranges|join(' · ') or 'Price to be determined' }}</dd></div>
+        <div><dt>Price guide</dt><dd>{{ boutique.price_ranges|join(' · ') or boutique.price_info or 'Price to be determined' }}</dd></div>
     </dl>
-    <details class="info-accordion seller-delivery"><summary>Production, shipping &amp; alterations</summary><p>These details have not been provided. Confirm them directly with the seller before making a purchase.</p></details>
+    <details class="info-accordion seller-delivery"><summary>Production, shipping &amp; alterations</summary>{% if boutique.lead_time or boutique.shipping_regions %}{% if boutique.lead_time %}<p><strong>Typical lead time:</strong> {{ boutique.lead_time }}</p>{% endif %}{% if boutique.shipping_regions %}<p><strong>Delivery areas:</strong> {{ boutique.shipping_regions }}</p>{% endif %}<p>Confirm timing and any alterations directly with the seller.</p>{% else %}<p>These details have not been provided. Confirm them directly with the seller before making a purchase.</p>{% endif %}</details>
 </section>
 <section class="seller-collection" aria-labelledby="collection-heading">
     <div class="section-heading"><h2 id="collection-heading">From this seller</h2><p class="result-count" role="status">{{ products|length }} {{ 'piece' if products|length == 1 else 'pieces' }}</p></div>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | CultureLink{% endblock %}
+{% block page_class %}account-page{% endblock %}
+{% block content %}
+<section class="auth-card account-message" aria-labelledby="message-heading">
+    <p class="eyebrow">YOUR CULTURELINK ACCOUNT</p>
+    <h1 id="message-heading">{{ title }}</h1>
+    <p role="alert">{{ message }}</p>
+    <div class="detail-actions">
+        <a class="button" href="{{ url_for('auth.login') }}">Log In</a>
+        <a class="button secondary-button" href="{{ url_for('auth.register') }}">Create Account</a>
+    </div>
+</section>
+{% endblock %}

@@ -9,7 +9,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='discover.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='accounts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='profiles.css', v='setup-motion-1') }}">
     <script src="{{ url_for('static', filename='ui.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='accounts.js', v='setup-motion-1') }}" defer></script>
+    <script src="{{ url_for('static', filename='profiles.js', v='setup-motion-1') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -21,8 +25,29 @@
             <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') %} aria-current="page"{% endif %}>Discover</a>
             <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
         </nav>
+        <div class="header-account">
+            {% if g.user %}
+            <a href="{{ url_for('auth.account') }}"{% if endpoint == 'auth.account' %} aria-current="page"{% endif %}>My Account</a>
+            <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="logout-button">Log Out</button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}"{% if endpoint == 'auth.login' %} aria-current="page"{% endif %}>Log In</a>
+            <a href="{{ url_for('auth.register') }}" class="account-create"{% if endpoint == 'auth.register' %} aria-current="page"{% endif %}>Create Account</a>
+            {% endif %}
+        </div>
     </header>
     <main id="main-content" class="page {% block page_class %}{% endblock %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="account-notices" aria-live="polite">
+            {% for category, message in messages %}
+            <p class="account-notice {{ 'notice-success' if category == 'success' else 'notice-info' }}" role="status">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
     <footer class="site-footer">

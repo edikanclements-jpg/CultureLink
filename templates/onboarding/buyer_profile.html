@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from 'onboarding/_fields.html' import field, address_fields, setup_heading, error_summary %}
+{% block title %}Buyer Profile | CultureLink{% endblock %}
+{% block page_class %}profile-page{% endblock %}
+{% block content %}
+<div class="profile-shell">
+    {{ setup_heading('buyer', completed) }}
+    <p class="profile-intro">A few details about you and your style. Measurements and your address are optional.</p>
+    <p class="hint">Fields marked * are required.</p>
+    {{ error_summary(errors) }}
+    <form method="post" action="{{ url_for('onboarding.buyer_profile') }}" class="profile-form" data-onboarding-form="profile" data-setup-recovery="{{ url_for('auth.account') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <section class="profile-section" aria-labelledby="buyer-basics">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">01</span><div><h2 id="buyer-basics">Start with the basics.</h2><p>Your account email is {{ g.user.email }}.</p></div></div>
+            <div class="profile-grid">
+                {{ field('full_name', 'Full name', values, errors, required=true, maximum=150, autocomplete='name') }}
+                {{ field('phone', 'Phone number', values, errors, type='tel', maximum=40, autocomplete='tel') }}
+            </div>
+        </section>
+        <section class="profile-section" aria-labelledby="buyer-style">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">02</span><div><h2 id="buyer-style">What feels like you?</h2><p>Separate multiple choices with commas.</p></div></div>
+            <div class="profile-grid">
+                {{ field('color_preferences', 'Favorite colors', values, errors, placeholder='e.g. Burgundy, gold, blue') }}
+                {{ field('culture_preferences', 'Cultures you shop for', values, errors, placeholder='e.g. Nigerian, Indian, Korean') }}
+                <div class="span-two">{{ field('occasion_preferences', 'Occasions you shop for', values, errors, placeholder='e.g. Weddings, festivals, formal events') }}</div>
+            </div>
+        </section>
+        <section class="profile-section" aria-labelledby="buyer-fit">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">03</span><div><h2 id="buyer-fit">Keep your measurements close.</h2><p>Optional. Enter all measurements in the unit you select.</p></div></div>
+            <div class="profile-field unit-field">
+                <label for="profile-measurement_unit">Measurement unit</label>
+                <select id="profile-measurement_unit" name="measurement_unit"{% if errors.measurement_unit %} aria-invalid="true" aria-describedby="error-measurement_unit"{% endif %}><option value="in"{% if values.measurement_unit == 'in' %} selected{% endif %}>Inches (in)</option><option value="cm"{% if values.measurement_unit == 'cm' %} selected{% endif %}>Centimeters (cm)</option></select>
+                {% if errors.measurement_unit %}<p class="field-error" id="error-measurement_unit">{{ errors.measurement_unit }}</p>{% endif %}
+            </div>
+            <div class="profile-grid measurement-grid">
+                {{ field('chest', 'Chest / bust', values, errors, type='number') }}
+                {{ field('waist', 'Waist', values, errors, type='number') }}
+                {{ field('hips', 'Hips', values, errors, type='number') }}
+                {{ field('height', 'Height', values, errors, type='number') }}
+            </div>
+        </section>
+        <section class="profile-section" aria-labelledby="buyer-address">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">04</span><div><h2 id="buyer-address">Your address.</h2><p>Optional and private. If you add an address, include the street, city, and country.</p></div></div>
+            {{ address_fields(values, errors) }}
+        </section>
+        <div class="profile-form-actions"><p>You can update these details from My Account.</p><button type="submit">{{ 'Save Changes' if completed else 'Save Buyer Profile' }} <span aria-hidden="true">&rarr;</span></button></div>
+    </form>
+</div>
+{% endblock %}

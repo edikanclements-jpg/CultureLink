@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from 'onboarding/_fields.html' import field, text_area, address_fields, setup_heading, error_summary %}
+{% block title %}Seller Profile | CultureLink{% endblock %}
+{% block page_class %}profile-page{% endblock %}
+{% block content %}
+<div class="profile-shell">
+    {{ setup_heading('seller', completed) }}
+    <p class="profile-intro">Introduce your business and what makes your collection yours.</p>
+    <p class="hint">Fields marked * are required.</p>
+    {{ error_summary(errors) }}
+    <form method="post" action="{{ url_for('onboarding.seller_profile') }}" class="profile-form" data-onboarding-form="profile" data-setup-recovery="{{ url_for('auth.account') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <section class="profile-section" aria-labelledby="seller-business">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">01</span><div><h2 id="seller-business">Meet your business.</h2><p>Your account email is {{ g.user.email }}.</p></div></div>
+            <div class="profile-grid">
+                {{ field('business_name', 'Business name', values, errors, required=true, maximum=150, autocomplete='organization') }}
+                {{ field('contact_name', 'Contact name', values, errors, required=true, maximum=150, autocomplete='name') }}
+                {{ field('phone', 'Phone number', values, errors, type='tel', maximum=40, autocomplete='tel', hint='Kept private in your account.') }}
+                {{ field('website_url', 'Website', values, errors, type='url', placeholder='https://your-store.com') }}
+                <div class="span-two">{{ field('social_url', 'Social page', values, errors, type='url', placeholder='https://instagram.com/your-business') }}</div>
+                <div class="span-two">{{ text_area('description', 'About your business', values, errors, hint='Tell buyers about your craft, your story, and what you offer.') }}</div>
+            </div>
+        </section>
+        <section class="profile-section" aria-labelledby="seller-collection">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">02</span><div><h2 id="seller-collection">What do you create?</h2><p>Separate multiple choices with commas.</p></div></div>
+            <div class="profile-grid">
+                {{ field('cultures', 'Cultures represented', values, errors, required=true, placeholder='e.g. Nigerian, Indian, Korean') }}
+                {{ field('occasions', 'Occasions', values, errors, required=true, placeholder='e.g. Weddings, festivals, formal events') }}
+                <div class="span-two">{{ field('clothing_types', 'Clothing types', values, errors, required=true, placeholder='e.g. Dresses, traditional sets, custom tailoring') }}</div>
+            </div>
+        </section>
+        <section class="profile-section" aria-labelledby="seller-timing">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">03</span><div><h2 id="seller-timing">Set the expectations.</h2><p>Give buyers a useful starting point.</p></div></div>
+            <div class="profile-grid">
+                {{ field('lead_time', 'Typical lead time', values, errors, required=true, maximum=150, placeholder='e.g. Made to order in 2–3 weeks') }}
+                {{ field('price_info', 'Price guide', values, errors, placeholder='e.g. USD 100–300, or price to be determined') }}
+                <div class="span-two">{{ field('shipping_regions', 'Delivery areas', values, errors, placeholder='e.g. United States, Nigeria, or worldwide') }}</div>
+            </div>
+        </section>
+        <section class="profile-section" aria-labelledby="seller-location">
+            <div class="profile-section-heading"><span class="section-number" aria-hidden="true">04</span><div><h2 id="seller-location">Where are you based?</h2><p>City, state/region, and country appear on your seller page. Street address and postal code stay private.</p></div></div>
+            {{ address_fields(values, errors, seller=true) }}
+        </section>
+        <div class="profile-form-actions"><p>You can update these details from My Account.</p><button type="submit">{{ 'Save Changes' if completed else 'Save Seller Profile' }} <span aria-hidden="true">&rarr;</span></button></div>
+    </form>
+</div>
+{% endblock %}

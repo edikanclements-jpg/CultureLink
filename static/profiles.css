@@ -1,0 +1,126 @@
+/* Buyer/seller choice and the two profile forms. */
+.role-page { min-height: 65vh; }
+.role-page-intro { max-width: 760px; text-align: center; margin: 70px auto; }
+.role-page-intro h1 { font-size: clamp(42px,5vw,66px); }
+.role-page-intro > p:not(.eyebrow) { font-size: 22px; }
+.role-page-intro > button { margin-top: 18px; }
+.role-dialog { position: fixed; inset: 0; margin: auto; width: calc(100% - 40px); max-width: 830px; height: fit-content; max-height: calc(100dvh - 36px); overflow-y: auto; border: 1px solid rgba(79,3,1,.12); border-radius: 20px; padding: 42px; color: var(--burgundy); background: #fff2dd; box-shadow: 0 28px 100px rgba(60,20,10,.26); }
+.role-dialog::backdrop { background: rgba(60,20,10,.42); backdrop-filter: blur(5px); }
+.role-dialog > .eyebrow { margin: 0 45px 15px 0; }
+.role-dialog h2 { font-size: clamp(34px,4.3vw,48px); line-height: 1.05; margin: 0; }
+.role-dialog h2:focus { outline: none; }
+.role-dialog > p:not(.eyebrow):not(.role-later) { font-size: 18px; line-height: 1.5; margin: 18px 0 25px; max-width: 570px; }
+.role-close { position: absolute; top: 18px; right: 20px; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid rgba(79,3,1,.18); border-radius: 50%; text-decoration: none; font-family: Arial,sans-serif; font-size: 25px; line-height: 1; }
+.role-close:hover { background: var(--cream); }
+.role-cards { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; }
+.role-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0; min-width: 0; min-height: 267px; border: 1px solid rgba(79,3,1,.24); border-radius: 13px; background: #fff9ef; color: var(--burgundy); padding: 25px; text-align: left; transition: background .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.role-card:hover { border-color: var(--burgundy); background: var(--cream); box-shadow: 0 7px 20px rgba(79,3,1,.08); }
+.role-card:focus-visible { outline: 3px solid var(--burgundy); outline-offset: 3px; }
+.role-icon { width: 57px; height: 57px; display: grid; place-items: center; border-radius: 14px; background: #f2dfbf; margin-bottom: 19px; }
+.role-icon svg { width: 36px; height: 36px; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.role-card-title { display: block; font-family: 'Cormorant Garamond','Times New Roman',serif; font-weight: 600; font-size: 34px; line-height: 1.15; margin-bottom: 10px; }
+.role-card-description { display: block; font-size: 17px; line-height: 1.45; margin-bottom: 23px; }
+.role-card-action { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(79,3,1,.16); font-size: 15px; font-weight: bold; }
+.role-later { text-align: center; font-size: 15px; margin: 23px 0 0; }
+.profile-shell { max-width: 1010px; margin: 0 auto; }
+.setup-steps { list-style: none; display: flex; flex-wrap: wrap; gap: 15px 32px; padding: 0; margin: 0 0 35px; font-size: 15px; }
+.setup-steps li { display: flex; align-items: center; gap: 9px; }
+.setup-steps li > span { display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid rgba(79,3,1,.45); border-radius: 50%; font-size: 13px; }
+.setup-steps li[aria-current] { font-weight: bold; }
+.setup-steps li[aria-current] > span { background: var(--burgundy); color: var(--cream); }
+.profile-page-heading { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 15px; }
+.profile-page-heading h1 { font-size: clamp(40px,5.3vw,64px); margin-bottom: 0; }
+.profile-page-heading .eyebrow { margin-top: 0; }
+.profile-page-heading > .text-link { font-size: 16px; }
+.profile-intro { font-size: 21px; max-width: 750px; margin: 20px 0 8px; }
+.profile-form { margin-top: 28px; }
+.profile-section { background: var(--cream); border: 1px solid rgba(79,3,1,.2); border-radius: 12px; padding: 30px; margin-bottom: 22px; }
+.profile-section-heading { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 26px; }
+.section-number { width: 35px; height: 35px; min-width: 35px; border: 1px solid rgba(79,3,1,.3); border-radius: 50%; display: grid; place-items: center; font-size: 13px; margin-top: 3px; }
+.profile-section-heading h2 { font-size: 32px; line-height: 1.15; margin: 0 0 8px; }
+.profile-section-heading p { margin: 0; font-size: 16px; max-width: 700px; overflow-wrap: anywhere; }
+.profile-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 22px; }
+.profile-grid .span-two { grid-column: 1 / -1; min-width: 0; }
+.profile-field { min-width: 0; }
+.profile-field label { display: block; font-size: 17px; margin-bottom: 8px; }
+.profile-field .optional { font-size: 14px; opacity: .82; white-space: nowrap; }
+.profile-field input, .profile-field textarea, .profile-field select { background: #fff1dc; min-width: 0; }
+.profile-field textarea { font: inherit; width: 100%; color: var(--burgundy); padding: 12px; border: 1px solid rgba(79,3,1,.45); border-radius: 4px; resize: vertical; }
+.profile-field textarea:focus-visible { outline: 3px solid var(--burgundy); outline-offset: 3px; }
+.profile-field [aria-invalid="true"] { border: 2px solid var(--terracotta); }
+.profile-field .hint { margin: 7px 0 0; }
+.measurement-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.unit-field { max-width: 300px; margin-bottom: 22px; }
+.profile-form-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; margin-top: 30px; }
+.profile-form-actions > p { font-size: 16px; margin: 0; }
+.profile-form-actions button { display: flex; justify-content: space-between; gap: 35px; padding: 14px 22px; min-width: 230px; }
+@media (max-width: 760px) {
+    .profile-section { padding: 24px; }
+    .measurement-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .role-dialog { padding: 32px; }
+    .role-card { padding: 22px; }
+}
+@media (max-width: 600px) {
+    .role-dialog { width: calc(100% - 28px); max-height: calc(100dvh - 28px); padding: 30px 22px 23px; border-radius: 17px; }
+    .role-dialog > .eyebrow { font-size: 10px; letter-spacing: 1.5px; margin-bottom: 17px; }
+    .role-dialog > p:not(.eyebrow):not(.role-later) { font-size: 16px; margin: 14px 0 21px; }
+    .role-cards { grid-template-columns: minmax(0,1fr); gap: 13px; }
+    .role-card { min-height: 205px; padding: 20px; }
+    .role-icon { width: 45px; height: 45px; margin-bottom: 12px; border-radius: 10px; }
+    .role-icon svg { width: 30px; height: 30px; }
+    .role-card-title { font-size: 30px; margin-bottom: 7px; }
+    .role-card-description { font-size: 16px; margin-bottom: 14px; }
+    .role-card-action { font-size: 14px; padding-top: 12px; }
+    .role-later { margin-top: 19px; }
+    .setup-steps { gap: 12px 18px; margin-bottom: 29px; font-size: 13px; }
+    .setup-steps li { gap: 6px; }
+    .setup-steps li > span { width: 22px; height: 22px; }
+    .profile-intro { font-size: 19px; }
+    .profile-grid { grid-template-columns: minmax(0,1fr); gap: 20px; }
+    .profile-section { padding: 23px 18px; }
+    .profile-section-heading { gap: 12px; margin-bottom: 23px; }
+    .profile-section-heading h2 { font-size: 28px; }
+    .profile-section-heading p { font-size: 15px; }
+    .section-number { width: 30px; height: 30px; min-width: 30px; }
+    .profile-form-actions button { width: 100%; }
+    .profile-page-heading > .text-link { min-height: 30px; }
+}
+/* Quiet motion connects account creation, role selection, and the profile. */
+.setup-motion .role-dialog[open] { animation: setup-dialog-in .44s cubic-bezier(.22,1,.36,1); }
+.setup-motion .role-dialog[open]::backdrop { animation: setup-backdrop-in .3s ease-out; }
+.role-welcome-mark { display: grid; place-items: center; width: 39px; height: 39px; margin-bottom: 17px; border: 1px solid rgba(79,3,1,.18); border-radius: 50%; background: #f2dfbf; }
+.role-welcome-mark svg { width: 24px; height: 24px; stroke: var(--burgundy); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.setup-motion .role-dialog[open] .role-welcome-mark path { stroke-dasharray: 22; stroke-dashoffset: 0; animation: setup-check-in .45s .12s both; }
+.setup-motion .role-dialog[open] .role-card { animation: setup-card-in .42s .1s cubic-bezier(.22,1,.36,1) backwards; }
+.setup-motion .role-dialog[open] .role-card:nth-child(2) { animation-delay: .17s; }
+.role-card { position: relative; transition: transform .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease, opacity .2s ease; }
+.setup-motion .role-card:hover:not(:disabled) { transform: translateY(-4px); }
+.role-card:disabled { cursor: progress; }
+.role-card.is-selected { border-color: var(--burgundy); background: #f2dfbf; box-shadow: 0 0 0 2px rgba(79,3,1,.14), 0 10px 26px rgba(79,3,1,.08); }
+.role-card.is-selected::after { content: '\2713'; position: absolute; top: 19px; right: 19px; display: grid; place-items: center; width: 26px; height: 26px; background: var(--burgundy); color: var(--cream); border-radius: 50%; font-family: Arial,sans-serif; font-size: 15px; }
+.role-card.is-unselected { opacity: .48; }
+.setup-loading { cursor: progress; }
+.setup-loading::after { content: ''; width: 17px; height: 17px; flex: 0 0 17px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: setup-spin .7s linear infinite; }
+.setup-announcement { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.profile-page-heading h1:focus, .account-summary h1:focus, .auth-layout h1:focus { outline: none; }
+@keyframes setup-dialog-in {
+    from { opacity: 0; transform: translateY(20px) scale(.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes setup-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes setup-card-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes setup-check-in { from { stroke-dashoffset: 22; } to { stroke-dashoffset: 0; } }
+@keyframes setup-spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) {
+    .role-welcome-mark { width: 32px; height: 32px; margin-bottom: 13px; }
+    .role-welcome-mark svg { width: 21px; height: 21px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .setup-motion .role-dialog[open], .setup-motion .role-dialog[open]::backdrop, .setup-motion .role-dialog[open] .role-card,
+    .setup-motion .role-dialog[open] .role-welcome-mark path, .setup-loading::after { animation: none; }
+    .role-card { transition: none; }
+    .setup-motion .role-card:hover:not(:disabled) { transform: none; }
+}

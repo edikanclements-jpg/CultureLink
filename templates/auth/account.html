@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}My Account | CultureLink{% endblock %}
+{% block page_class %}account-page{% endblock %}
+{% block content %}
+<section class="account-summary" aria-labelledby="account-heading">
+    <div>
+        <p class="eyebrow">MY CULTURELINK</p>
+        <h1 id="account-heading">{{ 'Your business.' if account_type == 'seller' else 'Make yourself' }}<br>{{ 'Your connection.' if account_type == 'seller' else 'at home.' }}</h1>
+        <p class="account-summary-intro">{{ 'Your seller profile is ready to share.' if account_type == 'seller' else 'Your buyer profile is ready. Make it your own.' if account_type == 'buyer' else "You're logged in and ready to explore." }}</p>
+        {% if profile %}<a class="text-link" href="{{ url_for('onboarding.seller_profile' if account_type == 'seller' else 'onboarding.buyer_profile') }}">Edit {{ account_type }} profile <span aria-hidden="true">&rarr;</span></a>{% endif %}
+    </div>
+    <div class="auth-card account-details">
+        <p class="eyebrow">YOUR ACCOUNT</p>
+        <h2>{{ profile.business_name if account_type == 'seller' else profile.full_name if profile else 'A place for your style.' }}</h2>
+        <dl>
+            <div><dt>Email address</dt><dd>{{ g.user.email }}</dd></div>
+            <div><dt>Account type</dt><dd>{{ 'Buyer' if g.user.role == 'customer' else g.user.role|title }}</dd></div>
+            {% if account_type == 'buyer' %}
+            <div><dt>Favorite colors</dt><dd>{{ profile.color_preferences or 'Not added' }}</dd></div>
+            <div><dt>Cultures &amp; occasions</dt><dd>{{ profile.culture_preferences or 'Not added' }}{% if profile.occasion_preferences %} &middot; {{ profile.occasion_preferences }}{% endif %}</dd></div>
+            {% elif account_type == 'seller' %}
+            <div><dt>Cultures represented</dt><dd>{{ profile.cultures }}</dd></div>
+            <div><dt>Typical lead time</dt><dd>{{ profile.lead_time }}</dd></div>
+            <div><dt>Seller review</dt><dd>{{ 'Not yet reviewed' if profile.verification_status == 'unreviewed' else profile.verification_status|replace('_', ' ')|capitalize }}</dd></div>
+            {% endif %}
+        </dl>
+        {% if account_type == 'seller' %}<a class="button auth-submit" href="{{ url_for('boutiques.boutique_details', boutique_id=profile.seller_id) }}">View seller page <span aria-hidden="true">&rarr;</span></a>{% else %}<a class="button auth-submit" href="{{ url_for('products.product_catalog') }}">Discover pieces <span aria-hidden="true">&rarr;</span></a>{% endif %}
+        <a class="text-link" href="{{ url_for('boutiques.boutique_directory') }}">Meet the sellers <span aria-hidden="true">&rarr;</span></a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Choose Your Role | CultureLink{% endblock %}
+{% block page_class %}role-page{% endblock %}
+{% block content %}
+<section class="role-page-intro">
+    <p class="eyebrow">YOUR NEXT CHAPTER</p>
+    <h1>Your account is ready.</h1>
+    <p>Tell us how you'd like to be part of CultureLink.</p>
+    <button type="button" data-open-role>Choose Buyer or Seller</button>
+</section>
+<dialog class="role-dialog" data-role-dialog open aria-labelledby="role-heading" aria-describedby="role-description">
+    <a class="role-close" href="{{ url_for('products.product_catalog') }}" aria-label="Browse for now"><span aria-hidden="true">&times;</span></a>
+    <span class="role-welcome-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8"/></svg></span>
+    <p class="eyebrow">WELCOME TO CULTURELINK</p>
+    <h2 id="role-heading" tabindex="-1">Are you a buyer<br>or a seller?</h2>
+    <p id="role-description">Choose your path. We'll help you create a profile that fits.</p>
+    {% if errors %}<div class="auth-errors" role="alert" tabindex="-1">{% for message in errors.values() %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
+    <form method="post" action="{{ url_for('onboarding.choose_role') }}" data-onboarding-form="role" data-setup-recovery="{{ url_for('auth.account') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="role-cards">
+            <button class="role-card" type="submit" name="account_type" value="buyer">
+                <span class="role-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M9 13h22l2 21H7l2-21Z"/><path d="M14 15V10a6 6 0 0 1 12 0v5"/></svg></span>
+                <span class="role-card-title">I'm a Buyer</span>
+                <span class="role-card-description">Find cultural pieces for your style and every occasion.</span>
+                <span class="role-card-action">Create buyer profile <span aria-hidden="true">&rarr;</span></span>
+            </button>
+            <button class="role-card" type="submit" name="account_type" value="seller">
+                <span class="role-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M8 18v16h24V18M6 16l4-10h20l4 10"/><path d="M6 16a4 4 0 0 0 8 0 4 4 0 0 0 8 0 4 4 0 0 0 8 0 2 2 0 0 0 4 0M16 34V23h8v11"/></svg></span>
+                <span class="role-card-title">I'm a Seller</span>
+                <span class="role-card-description">Introduce your business and the pieces you create.</span>
+                <span class="role-card-action">Create seller profile <span aria-hidden="true">&rarr;</span></span>
+            </button>
+        </div>
+        <p class="setup-announcement" data-setup-announcement role="status" aria-live="polite" aria-atomic="true"></p>
+    </form>
+    <p class="role-later"><a href="{{ url_for('products.product_catalog') }}">I'll explore first</a></p>
+</dialog>
+{% endblock %}
