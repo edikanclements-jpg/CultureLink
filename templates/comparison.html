@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_image with context %}
+{% block title %}Compare Pieces | CultureLink{% endblock %}
+{% block page_class %}comparison-page{% endblock %}
+{% block content %}
+<div data-comparison-page>
+<header class="comparison-heading"><div><p class="eyebrow">YOUR PIECES, SIDE BY SIDE</p><h1>A closer look.</h1><p>Compare the details. Find what feels like you.</p></div><a class="button secondary-button" href="{{ url_for('closet.index') }}">Back to my closet <span aria-hidden="true">&rarr;</span></a></header>
+{% if problem %}
+<div class="closet-empty" role="alert"><h2>Let's try that again.</h2><p>{{ problem }}</p><a class="button" href="{{ url_for('closet.compare') }}">Try again</a></div>
+{% elif products|length < 2 %}
+<div class="closet-empty"><h2>Give your favorites a closer look.</h2><p>{{ 'One piece is selected. Choose one or two more from your saved closet.' if products else 'Choose 2 or 3 pieces from your saved closet to start comparing.' }}</p><a class="button" href="{{ url_for('closet.index') }}">Choose pieces <span aria-hidden="true">&rarr;</span></a></div>
+{% else %}
+<div class="comparison-toolbar"><p>{{ products|length }} pieces selected <span class="comparison-mobile-hint">&middot; Swipe across to see every piece.</span></p><form method="post" action="{{ url_for('closet.compare_clear') }}" data-compare-form><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="view" value="comparison"><button type="submit" class="compare-clear">Clear comparison</button></form></div>
+<div class="comparison-scroll" tabindex="0" role="region" aria-label="Side-by-side piece comparison">
+<table class="comparison-table" style="--compare-count: {{ products|length }}"><caption class="setup-announcement">Details of your selected pieces</caption><thead><tr><th scope="col" class="comparison-row-label">The details</th>{% for product in products %}<th scope="col" data-compare-column="{{ product.product_id }}"><a class="comparison-image" href="{{ url_for('products.product_details', product_id=product.product_id) }}">{{ product_image(product, eager=true) }}</a><p class="culture-tag">{{ product.culture }}</p><h2><a href="{{ url_for('products.product_details', product_id=product.product_id) }}">{{ product.product_name }}</a></h2><form method="post" action="{{ url_for('closet.compare_remove', product_id=product.product_id) }}" data-compare-form><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="view" value="comparison"><button type="submit" class="comparison-remove" aria-label="Remove {{ product.product_name }} from comparison">Remove from comparison</button></form></th>{% endfor %}</tr></thead>
+<tbody>{% for label,key in [('Price','display_price'),('Size','display_size'),('Color','color'),('Clothing type','clothing_type'),('Culture','culture'),('Occasion','occasion'),('Seller','boutique_name'),('Seller location','seller_location')] %}<tr><th scope="row">{{ label }}</th>{% for product in products %}<td>{% if key == 'boutique_name' %}<a href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">{{ product.boutique_name }}</a>{% else %}{{ product.get(key) or 'Not provided' }}{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table>
+</div>
+<p class="comparison-note">Prices are shown in each piece's listed currency. Prices and sizes marked &ldquo;to be determined&rdquo; haven't been supplied by the seller. Confirm availability and fit directly with the seller.</p>
+{% endif %}
+</div>
+{% endblock %}

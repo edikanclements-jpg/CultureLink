@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from '_components.html' import product_card %}
+{% from '_components.html' import product_card with context %}
 {% block title %}{{ boutique.boutique_name }} | CultureLink{% endblock %}
 {% block content %}
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('boutiques.boutique_directory') }}">Sellers</a><span aria-hidden="true">/</span><span>{{ boutique.boutique_name }}</span></nav>

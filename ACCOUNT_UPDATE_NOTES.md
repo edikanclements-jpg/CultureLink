@@ -1,10 +1,45 @@
 # Buyer and seller account setup
 
+The current cumulative package also includes the private Saved Closet.
+See `CLOSET_UPDATE_NOTES.md` for its behavior and validation, and use the
+current `START_HERE.txt` installation instructions for the complete update.
+
 After registration, CultureLink signs the new account in and opens a modal
 with two cards: Buyer and Seller. Selecting a card opens the corresponding
 profile form. Saving creates the profile and leads to My Account, where that
 profile can be edited. Login/logout, hashes, CSRF protection, and independent
 sessions remain part of the account flow.
+
+## Animated setup update
+
+The setup forms progressively submit with Fetch and render the server's
+next HTML page inside the existing document. The loading button leads into
+a fading backdrop and a gently rising role dialog. The welcome check draws
+in and the cards appear in sequence. Choosing a card highlights it, shows a
+check, dims the other card, and transitions into its profile form. Saving a
+profile transitions into My Account. The shared header and CSRF form update
+from the server response when the user becomes signed in.
+
+The enhancement sends the existing CSRF-protected forms to the existing
+routes. It adds no API, account fields, SQL, dependencies, or server changes.
+Required fields and server validation remain authoritative. Returned errors
+receive focus and the replacement forms retain their server-rendered values.
+Password visibility controls also work after a validation response.
+
+Duplicate submit events are blocked while a request is pending. A failed or
+timed-out response offers a GET link to continue from My Account, without
+automatically repeating a POST that may already have saved. Back/Forward
+and refresh resolve the current server state. Passwords and HTML snapshots
+are not saved into browser history or local/session storage.
+
+The native dialog retains keyboard focus and Escape/reopen controls.
+Reduced-motion preferences turn off movement, and lack of the animation API
+does not stop setup. Without JavaScript, the original form/redirect flow
+still works. Versioned asset links load the new scripts and styles.
+
+For an installation where profiles already work, replace only `templates/`
+and `static/`, then refresh the browser. The SQL migration is only needed
+once when adding profile storage to a new local database.
 
 ## Flow and ownership
 
@@ -87,6 +122,12 @@ private seller-data checks, Escape/reopen, keyboard focus containment, and
 no JavaScript errors or horizontal overflow. The full buyer setup also
 works without JavaScript. Desktop and phone screenshots were visually checked.
 
+Additional motion checks cover signup, role selection, profile validation,
+and profile saving in the same document; duplicate-submit prevention;
+loading and selected-card states; updated signed-in navigation; registration
+errors and password controls; Back/Forward and refresh; lost-response
+recovery without a POST retry; reduced motion; and missing animation API.
+
 These are tests against a temporary SQLite fixture and a MySQL-query adapter
 based on the supplied schema, including the two new tables. They are not a
 live MySQL test. The installation guide gives the final MySQL checks to run
@@ -110,5 +151,6 @@ added using the owned `seller_profiles.seller_id` relationship.
 - [Flask authentication](https://flask.palletsprojects.com/en/stable/tutorial/views/)
 - [Werkzeug password hashing](https://werkzeug.palletsprojects.com/en/stable/utils/#werkzeug.security.generate_password_hash)
 - [Native HTML dialog](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog)
+- [Element animations](https://developer.mozilla.org/en-US/docs/Web/API/Element/animate)
 - [MySQL locking reads](https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html)
 - [MySQL CREATE TABLE](https://dev.mysql.com/doc/refman/8.0/en/create-table.html)

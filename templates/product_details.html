@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% from '_components.html' import product_image %}
+{% from '_components.html' import product_image, closet_control with context %}
 {% block title %}{{ product.product_name }} | CultureLink{% endblock %}
 {% block page_class %}item-page{% endblock %}
 {% block content %}
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('products.product_catalog') }}">Discover</a><span aria-hidden="true">/</span><span>{{ product.product_name }}</span></nav>
-<article class="item-detail" data-item-id="{{ product.product_id }}" data-seller-id="{{ product.boutique_id }}">
+<article class="item-detail" id="piece-{{ product.product_id }}" data-item-id="{{ product.product_id }}" data-seller-id="{{ product.boutique_id }}">
     <div class="detail-photo">{{ product_image(product, eager=true) }}</div>
     <div class="detail-info">
         <p class="eyebrow">{{ product.culture }}{% if product.occasion %} · {{ product.occasion }}{% endif %}</p>
@@ -18,6 +18,7 @@
             <div><dt>Seller location</dt><dd>{{ product.seller_location or 'Not provided' }}</dd></div>
         </dl>
         <div class="detail-actions">
+            {{ closet_control(product) }}
             <a class="button" href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">View seller <span aria-hidden="true">→</span></a>
             {% if product.storefront_url %}<a class="button secondary-button" href="{{ product.storefront_url }}" target="_blank" rel="noopener noreferrer">Open storefront <span aria-hidden="true">↗</span></a>{% endif %}
         </div>

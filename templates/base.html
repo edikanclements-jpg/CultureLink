@@ -11,9 +11,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='discover.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='accounts.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='profiles.css', v='setup-motion-1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='closet.css', v='closet-1') }}">
     <script src="{{ url_for('static', filename='ui.js') }}" defer></script>
     <script src="{{ url_for('static', filename='accounts.js', v='setup-motion-1') }}" defer></script>
     <script src="{{ url_for('static', filename='profiles.js', v='setup-motion-1') }}" defer></script>
+    <script src="{{ url_for('static', filename='closet.js', v='compare-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='comparison.css', v='compare-1') }}">
+    <script src="{{ url_for('static', filename='comparison.js', v='compare-1') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -24,6 +28,7 @@
             <a href="{{ url_for('main.home') }}"{% if endpoint == 'main.home' %} aria-current="page"{% endif %}>Home</a>
             <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') %} aria-current="page"{% endif %}>Discover</a>
             <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
+            {% if g.user and g.user.role == 'customer' %}<a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') %} aria-current="page"{% endif %}>Closet</a>{% endif %}
         </nav>
         <div class="header-account">
             {% if g.user %}
@@ -54,5 +59,6 @@
         <div><a class="footer-wordmark" href="{{ url_for('main.home') }}">CultureLink</a><p>Connecting cultures through fashion.</p></div>
         <p class="hint">Student demonstration catalog. Confirm prices, sizing, and availability with each seller.</p>
     </footer>
+    <div class="closet-toast" data-closet-feedback role="status" aria-live="polite" aria-atomic="true" hidden></div>
 </body>
 </html>

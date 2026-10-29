@@ -7,6 +7,7 @@ from routes.products import products_bp
 from routes.boutiques import boutiques_bp
 from routes.auth import auth_bp
 from routes.onboarding import onboarding_bp
+from routes.closet import closet_bp
 from services.account_security import configure_account_security
 
 
@@ -29,6 +30,7 @@ def create_app(test_config=None):
     app.register_blueprint(boutiques_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(onboarding_bp)
+    app.register_blueprint(closet_bp)
 
     return app
 

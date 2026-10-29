@@ -1,0 +1,39 @@
+/* Saved Closet uses the existing CultureLink colors, cards, and type. */
+.piece-card-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-top: 17px; }
+.piece-card-actions > .text-link { margin: 0; font-size: 16px; }
+.closet-control { margin: 0; min-width: 0; }
+.closet-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: transparent; color: var(--burgundy); border: 1px solid rgba(79,3,1,.32); border-radius: 24px; min-height: 44px; padding: 9px 15px; font-size: 15px; line-height: 1.3; transition: background .2s ease, border-color .2s ease; }
+.closet-button svg, .closet-empty-icon svg { width: 19px; height: 19px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.closet-button:hover, .closet-button.is-saved { color: var(--burgundy); background: #f1d09e; border-color: var(--burgundy); }
+.closet-button.is-saved .closet-heart { fill: var(--burgundy); }
+.closet-button:disabled { cursor: wait; opacity: .65; }
+.closet-button[aria-busy='true'] svg { opacity: .4; }
+.closet-login { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 10px 0; }
+.closet-login span { font-size: 23px; line-height: 1; }
+.detail-actions .closet-button { min-height: 49px; padding: 12px 20px; font-size: 17px; }
+.detail-actions .closet-login { padding: 11px 0; }
+.account-closet-link { display: block; width: fit-content; margin-top: 18px; }
+.closet-page { padding-top: 53px; }
+.closet-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px; padding-bottom: 27px; border-bottom: 1px solid rgba(79,3,1,.23); }
+.closet-heading .eyebrow { margin-top: 0; }
+.closet-heading h1 { font-size: clamp(43px,5.8vw,72px); margin-bottom: 18px; }
+.closet-heading p:not(.eyebrow) { font-size: 21px; margin-bottom: 0; }
+.closet-heading > .button { margin-bottom: 3px; font-size: 16px; }
+.closet-count { font-size: 17px; margin: 25px 0 22px; }
+.closet-grid { grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); }
+.closet-empty { background: #fff0d7; border: 1px solid rgba(79,3,1,.2); border-radius: 18px; max-width: 830px; margin: 36px auto 20px; padding: 65px 30px; text-align: center; }
+.closet-empty-icon { display: grid; place-items: center; width: 70px; height: 70px; border: 1px solid rgba(79,3,1,.2); border-radius: 50%; margin: 0 auto 24px; }
+.closet-empty-icon svg { width: 31px; height: 31px; }
+.closet-empty h2 { font-size: clamp(31px,3.4vw,43px); line-height: 1.12; margin: 0; }
+.closet-empty p { max-width: 450px; margin: 18px auto 28px; font-size: 19px; }
+.closet-toast { position: fixed; z-index: 20; bottom: 24px; right: 24px; width: fit-content; max-width: min(440px,calc(100% - 40px)); padding: 15px 20px; background: #fff2dd; color: var(--burgundy); border: 1px solid rgba(79,3,1,.28); border-left: 4px solid var(--burgundy); border-radius: 10px; font-size: 16px; box-shadow: 0 8px 35px rgba(60,20,10,.17); overflow-wrap: anywhere; }
+@media (max-width: 760px) { .closet-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 560px) {
+    .closet-page { padding-top: 30px; }
+    .closet-grid { grid-template-columns: minmax(0,1fr); }
+    .closet-empty { padding: 40px 22px; }
+    .closet-heading p:not(.eyebrow) { font-size: 19px; }
+    .closet-toast { left: 20px; right: 20px; bottom: 20px; width: auto; max-width: none; }
+    .detail-actions .closet-control, .detail-actions .closet-button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .closet-button { transition: none; } }

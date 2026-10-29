@@ -8,6 +8,7 @@
         <h1 id="account-heading">{{ 'Your business.' if account_type == 'seller' else 'Make yourself' }}<br>{{ 'Your connection.' if account_type == 'seller' else 'at home.' }}</h1>
         <p class="account-summary-intro">{{ 'Your seller profile is ready to share.' if account_type == 'seller' else 'Your buyer profile is ready. Make it your own.' if account_type == 'buyer' else "You're logged in and ready to explore." }}</p>
         {% if profile %}<a class="text-link" href="{{ url_for('onboarding.seller_profile' if account_type == 'seller' else 'onboarding.buyer_profile') }}">Edit {{ account_type }} profile <span aria-hidden="true">&rarr;</span></a>{% endif %}
+        {% if account_type == 'buyer' %}<a class="text-link account-closet-link" href="{{ url_for('closet.index') }}">Open my saved closet <span aria-hidden="true">&rarr;</span></a>{% endif %}
     </div>
     <div class="auth-card account-details">
         <p class="eyebrow">YOUR ACCOUNT</p>

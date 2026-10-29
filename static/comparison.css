@@ -1,0 +1,50 @@
+.compare-panel { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; margin: 0 0 26px; padding: 24px 27px; background: #fff0d7; border: 1px solid rgba(79,3,1,.22); border-radius: 14px; }
+.compare-panel h2 { font-size: 30px; line-height: 1.1; margin: 0 0 9px; }
+.compare-panel p { margin: 5px 0 0; font-size: 16px; }
+.compare-panel .compare-selection-count { font-size: 14px; font-weight: bold; }
+.compare-panel-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; }
+.compare-panel form { margin: 0; }
+.compare-panel-actions button { font-size: 16px; }
+.compare-panel button:disabled, .compare-toggle:disabled { opacity: .5; cursor: not-allowed; }
+.compare-clear, .comparison-remove { background: transparent; color: var(--burgundy); border: 0; padding: 10px 0; text-decoration: underline; text-underline-offset: 4px; font-size: 15px; }
+.compare-clear:hover, .comparison-remove:hover { background: transparent; color: var(--burgundy); }
+.compare-card-form { padding-top: 15px; margin-top: 16px; border-top: 1px solid rgba(79,3,1,.15); }
+.compare-toggle { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; width: 100%; padding: 10px 13px; background: transparent; color: var(--burgundy); border-color: rgba(79,3,1,.3); border-radius: 7px; font-size: 15px; }
+.compare-toggle:hover, .compare-toggle.is-selected { background: #f1d09e; color: var(--burgundy); border-color: var(--burgundy); }
+.comparison-heading { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 20px; padding: 17px 0 28px; border-bottom: 1px solid rgba(79,3,1,.25); }
+.comparison-heading p { margin-bottom: 0; font-size: 21px; }
+.comparison-heading .eyebrow { font-size: 12px; margin-top: 0; }
+.comparison-heading > a { font-size: 16px; }
+.comparison-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin: 18px 0; font-size: 16px; }
+.comparison-toolbar p { margin: 0; }
+.comparison-toolbar form { margin: 0; }
+.comparison-scroll { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid rgba(79,3,1,.24); border-radius: 13px; background: #fff1dc; }
+.comparison-scroll:focus-visible { outline: 3px solid var(--burgundy); outline-offset: 4px; }
+.comparison-table { width: 100%; min-width: 660px; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: 17px; }
+.comparison-table th, .comparison-table td { padding: 18px 21px; text-align: left; vertical-align: top; border-right: 1px solid rgba(79,3,1,.14); border-bottom: 1px solid rgba(79,3,1,.14); overflow-wrap: anywhere; }
+.comparison-table tr > :last-child { border-right: 0; }
+.comparison-table tbody tr:last-child > * { border-bottom: 0; }
+.comparison-table thead th { font-weight: normal; }
+.comparison-table .comparison-row-label, .comparison-table tbody th { position: sticky; left: 0; z-index: 1; width: 140px; background: #f3dfbf; font-weight: bold; font-size: 15px; }
+.comparison-table thead th:not(.comparison-row-label) { width: 260px; }
+.comparison-image { display: block; margin-bottom: 20px; }
+.comparison-image .photo-frame { max-width: 260px; margin: auto; }
+.comparison-table h2 { font-size: 28px; line-height: 1.12; margin: 10px 0; }
+.comparison-table h2 a { text-decoration: none; }
+.comparison-note { max-width: 900px; font-size: 15px; margin: 20px 0 0; }
+.comparison-mobile-hint { display: none; }
+@media (max-width: 900px) { .comparison-mobile-hint { display: inline; } }
+@media (max-width: 560px) {
+    .compare-panel { padding: 21px 18px; gap: 12px; }
+    .compare-panel-actions { width: 100%; justify-content: space-between; gap: 8px; }
+    .compare-panel-actions button { font-size: 14px; }
+    .comparison-heading h1 { font-size: 49px; }
+    .comparison-heading p { font-size: 19px; }
+    .comparison-toolbar { align-items: start; font-size: 14px; }
+    .comparison-toolbar p { max-width: 180px; }
+    .comparison-toolbar .compare-clear { padding-top: 0; font-size: 14px; text-align: right; }
+    .comparison-table { font-size: 16px; min-width: 0; width: calc(95px + (100vw - 135px) * var(--compare-count)); }
+    .comparison-table th, .comparison-table td { padding: 15px; }
+    .comparison-table .comparison-row-label, .comparison-table tbody th { width: 95px; font-size: 14px; overflow-wrap: normal; }
+    .comparison-table thead th:not(.comparison-row-label) { width: calc(100vw - 135px); }
+}
