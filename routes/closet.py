@@ -5,11 +5,14 @@ import re
 import secrets
 from urllib.parse import unquote, urlsplit, urlunsplit
 
-from flask import Blueprint, abort, current_app, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, current_app, flash, g, jsonify, make_response, redirect, render_template, request, session, url_for
 from mysql.connector import Error
 from services.closet import ClosetAccessError, ClosetItemNotFound, saved_item_ids, saved_products, set_saved
 from services.comparison import ComparisonItemError, ComparisonLimitError, change_selection, selection_ids
 from services import outfits as outfit_service
+from services import shopping as shopping_service
+from services import shopping_ai
+from services.account_security import AttemptLimiter
 
 closet_bp = Blueprint("closet", __name__)
 
@@ -72,7 +75,7 @@ def _return_url(value):
         parts = urlsplit(value)
     except ValueError:
         return fallback
-    if parts.scheme or parts.netloc or not re.fullmatch(r"/(?:closet(?:/compare)?|(?:products|boutiques)(?:/[0-9]+)?)?", parts.path):
+    if parts.scheme or parts.netloc or not re.fullmatch(r"/(?:closet(?:/(?:compare|assistant))?|(?:products|boutiques)(?:/[0-9]+)?)?", parts.path):
         return fallback
     fragment = parts.fragment if re.fullmatch(r"piece-[0-9]+", parts.fragment) else ""
     return urlunsplit(("", "", parts.path, parts.query, fragment))
@@ -331,3 +334,66 @@ def outfit_delete(outfit_id):
         return redirect(url_for("closet.outfit_detail", outfit_id=outfit_id), code=303)
     flash("Outfit deleted. Your saved Closet pieces are still there.", "success")
     return redirect(url_for("closet.outfits"), code=303)
+
+
+def _guide_state():
+    state = session.get("_shopping_guide")
+    if not isinstance(state, dict) or state.get("user_id") != g.user["user_id"]:
+        return {"filters": shopping_service.empty_filters(), "query": "", "mode": "catalog", "action": "search", "notice": ""}
+    try:
+        state["filters"] = shopping_service.validate_filters(state["filters"])
+        if not isinstance(state.get("query"), str) or len(state["query"]) > 400:
+            raise ValueError()
+        if state.get("mode") not in {"catalog", "ai"} or state.get("action") not in shopping_ai.ACTIONS:
+            raise ValueError()
+    except (shopping_service.GuideInputError, KeyError, TypeError, ValueError):
+        session.pop("_shopping_guide", None)
+        return {"filters": shopping_service.empty_filters(), "query": "", "mode": "catalog", "action": "search", "notice": ""}
+    return state
+
+
+def _guide_response(result=None, error=None, status=200, draft="", retry_after=None):
+    response = make_response(render_template("shopping.html", result=result, error=error, draft=draft,
+                                           ai_configured=bool(shopping_ai.settings()["key"]), has_context=bool(_guide_state()["query"]),
+                                           refine_checked=request.method != "POST" or request.form.get("refine") == "yes",
+                                           use_ai_checked=request.method != "POST" or request.form.get("use_ai") == "yes"), status)
+    response.headers["Cache-Control"] = "no-store"
+    if retry_after is not None:
+        response.headers["Retry-After"] = str(retry_after)
+    return response
+
+
+@closet_bp.route("/closet/assistant", methods=["GET", "POST"])
+@buyer_required
+def assistant():
+    state = _guide_state()
+    if request.method == "POST":
+        text = request.form.get("example") or request.form.get("query", "")
+        limiter = current_app.extensions.setdefault("shopping_attempts", AttemptLimiter())
+        retry_after = limiter.consume(g.user["user_id"], 30, 60)
+        if retry_after:
+            return _guide_response(error="Let's pause for a moment. Try your search again in a minute.", status=429, draft=text[:400], retry_after=retry_after)
+        previous = state["filters"] if request.form.get("refine") == "yes" and not request.form.get("example") else shopping_service.empty_filters()
+        try:
+            result = shopping_service.answer(text, previous, g.user["user_id"], use_ai=request.form.get("use_ai") == "yes")
+        except shopping_service.GuideInputError as error:
+            return _guide_response(error=str(error), status=400, draft=text[:400])
+        except Error:
+            current_app.logger.warning("Could not read catalog data for the shopping guide.")
+            return _guide_response(error="We couldn't open the catalog right now. Your search text is still here. Please try again in a moment.", status=503, draft=text[:400])
+        session["_shopping_guide"] = {"user_id": g.user["user_id"], **{key: result[key] for key in ("filters", "query", "mode", "action", "notice")}}
+        # Refreshing the result page never resubmits an AI request.
+        return redirect(url_for("closet.assistant"), code=303)
+    try:
+        result = shopping_service.result_for(state["filters"], state["query"], state["mode"], state.get("notice", ""), state["action"])
+    except Error:
+        current_app.logger.warning("Could not read catalog data for the shopping guide.")
+        return _guide_response(error="We couldn't open the catalog right now. Please try again in a moment.", status=503)
+    return _guide_response(result=result)
+
+
+@closet_bp.route("/closet/assistant/reset", methods=["POST"])
+@buyer_required
+def assistant_reset():
+    session.pop("_shopping_guide", None)
+    return redirect(url_for("closet.assistant"), code=303)

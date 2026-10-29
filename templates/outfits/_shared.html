@@ -2,5 +2,6 @@
 <nav class="closet-tabs" aria-label="Closet sections">
     <a href="{{ url_for('closet.index') }}"{% if active == 'pieces' %} aria-current="page"{% endif %}>Saved pieces</a>
     <a href="{{ url_for('closet.outfits') }}"{% if active == 'outfits' %} aria-current="page"{% endif %}>Outfit planner</a>
+    <a href="{{ url_for('closet.assistant') }}" aria-label="Shopping guide"{% if active == 'guide' %} aria-current="page"{% endif %}>Guide</a>
 </nav>
 {%- endmacro %}

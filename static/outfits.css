@@ -101,7 +101,7 @@
     .outfit-heading { padding-top: 0; gap: 18px; }
     .outfit-heading h1 { font-size: 49px; }
     .outfit-heading p:not(.eyebrow) { font-size: 19px; }
-    .closet-tabs { font-size: 16px; gap: 26px; margin-bottom: 24px; }
+    .closet-tabs { font-size: 14px; gap: 16px; margin-bottom: 24px; }
     .outfit-gallery { grid-template-columns: 1fr; }
     .outfit-welcome { padding: 35px 22px 28px; margin-top: 25px; }
     .outfit-welcome p:not(.eyebrow) { font-size: 17px; }

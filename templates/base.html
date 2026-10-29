@@ -18,8 +18,10 @@
     <script src="{{ url_for('static', filename='closet.js', v='compare-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='comparison.css', v='compare-1') }}">
     <script src="{{ url_for('static', filename='comparison.js', v='compare-1') }}" defer></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='outfits.css', v='outfits-1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='outfits.css', v='outfits-2') }}">
     <script src="{{ url_for('static', filename='outfits.js', v='outfits-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='shopping.css', v='guide-1') }}">
+    <script src="{{ url_for('static', filename='shopping.js', v='guide-1') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -30,7 +32,7 @@
             <a href="{{ url_for('main.home') }}"{% if endpoint == 'main.home' %} aria-current="page"{% endif %}>Home</a>
             <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') %} aria-current="page"{% endif %}>Discover</a>
             <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
-            {% if g.user and g.user.role == 'customer' %}<a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') %} aria-current="page"{% endif %}>Closet</a>{% endif %}
+            {% if g.user and g.user.role == 'customer' %}<a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') and endpoint not in ['closet.assistant','closet.assistant_reset'] %} aria-current="page"{% endif %}>Closet</a><a href="{{ url_for('closet.assistant') }}"{% if endpoint == 'closet.assistant' %} aria-current="page"{% endif %}>Guide</a>{% endif %}
         </nav>
         <div class="header-account">
             {% if g.user %}

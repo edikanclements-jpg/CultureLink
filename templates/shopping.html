@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% from '_components.html' import product_card with context %}
+{% from 'outfits/_shared.html' import tabs %}
+{% block title %}Shopping Guide | CultureLink{% endblock %}
+{% block page_class %}shopping-page{% endblock %}
+{% block content %}
+<header class="guide-heading"><div><p class="eyebrow">A LITTLE DIRECTION. A LOT OF YOU.</p><h1>Find your kind of piece.</h1><p>Tell us what you have in mind. Start with a culture, color, or occasion.</p></div><a class="text-link" href="{{ url_for('closet.index') }}">My saved pieces <span aria-hidden="true">&rarr;</span></a></header>
+{{ tabs('guide') }}
+<div data-guide-body>
+{% if error %}<div class="guide-error" role="alert" tabindex="-1" data-guide-error><h2>Let's try that again.</h2><p>{{ error }}</p></div>{% endif %}
+<div class="guide-layout">
+<aside class="guide-studio" aria-labelledby="guide-form-title">
+    <div class="guide-studio-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="m16 3 3.5 9.5L29 16l-9.5 3.5L16 29l-3.5-9.5L3 16l9.5-3.5Z"/><path d="m26 2 .8 2.2L29 5l-2.2.8L26 8l-.8-2.2L23 5l2.2-.8Z"/></svg></div>
+    <p class="eyebrow">YOUR CULTURELINK GUIDE</p><h2 id="guide-form-title">What speaks to you?</h2>
+    <p class="guide-mode">{{ 'AI mode enabled' if ai_configured else 'Catalog search mode' }}</p>
+    <form method="post" action="{{ url_for('closet.assistant') }}" data-guide-form class="guide-query-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="guide-query">Describe your next find</label>
+        <textarea id="guide-query" name="query" rows="4" required maxlength="400" placeholder="Nigerian wedding pieces in red..." aria-describedby="guide-query-help">{{ draft }}</textarea>
+        <p class="guide-input-help" id="guide-query-help">Up to 400 characters. Include USD or INR with a budget.</p>
+        {% if has_context %}<label class="guide-check"><input type="checkbox" name="refine" value="yes"{% if refine_checked %} checked{% endif %}>Refine these results</label>{% endif %}
+        {% if ai_configured %}<label class="guide-check"><input type="checkbox" name="use_ai" value="yes"{% if use_ai_checked %} checked{% endif %}>Use AI for this search</label><p class="guide-input-help">This sends your search text and public filter choices to OpenAI. Your account and profile records stay here.</p>{% endif %}
+        <button type="submit" class="guide-send" data-guide-send>Find my pieces <span aria-hidden="true">&rarr;</span></button>
+        <p class="guide-example-label">Or start with a little inspiration</p>
+        <div class="guide-examples">
+            {% for text in ['Nigerian wedding pieces', 'Indian pieces under USD 150', 'Show me blue pieces'] %}<button type="submit" name="example" value="{{ text }}" formnovalidate>{{ text }} <span aria-hidden="true">↗</span></button>{% endfor %}
+        </div>
+    </form>
+    <details class="guide-about"><summary>How this guide works</summary><p>Results come from CultureLink's catalog. Search details are shown beside the results so you can check what was understood.</p><p>Budget searches leave out unknown prices and keep currencies separate. Confirm sizing, prices, and availability with the seller.</p><p>{{ 'AI helps interpret your words. Turning it off uses basic catalog search.' if ai_configured else 'Catalog mode recognizes basic search terms. AI language understanding can be connected separately.' }}</p><p>Your last search lasts for this signed-in session. It clears when you log out or choose New search.</p></details>
+</aside>
+<section class="guide-results" aria-labelledby="guide-results-title">
+    <div class="guide-results-top"><h2 id="guide-results-title">A starting point, just for you.</h2>{% if has_context %}<form method="post" action="{{ url_for('closet.assistant_reset') }}" data-guide-form><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="guide-reset">New search <span aria-hidden="true">↺</span></button></form>{% endif %}</div>
+    {% if result and result.query %}<div class="guide-question"><p>You asked</p><blockquote>{{ result.query }}</blockquote></div>{% endif %}
+    {% if result %}
+    <div class="guide-reply" tabindex="-1" data-guide-reply><div class="guide-reply-label"><span>CultureLink guide</span><span class="guide-response-mode">{{ 'AI interpreted' if result.mode == 'ai' else 'Catalog search' }}</span></div><p>{{ result.reply }}</p>
+        {% if result.notice %}<p class="guide-notice" role="status">{{ result.notice }}</p>{% endif %}
+        {% if result.needs_currency %}<div class="guide-currency" aria-label="Choose budget currency">{% for currency in ['USD','INR'] %}<form method="post" action="{{ url_for('closet.assistant') }}" data-guide-form><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="refine" value="yes"><button type="submit" name="query" value="{{ currency }}">Use {{ currency }}</button></form>{% endfor %}</div>{% endif %}
+    </div>
+    {% if result.criteria %}<ul class="guide-criteria" aria-label="Understood search details">{% for criterion in result.criteria %}<li>{{ criterion }}</li>{% endfor %}</ul>{% endif %}
+    {% if result.unknown_prices %}<p class="guide-price-note">{{ result.unknown_prices }} otherwise matching {{ 'piece has' if result.unknown_prices == 1 else 'pieces have' }} an unknown price and {{ 'is' if result.unknown_prices == 1 else 'are' }} excluded from this budget search.</p>{% endif %}
+    {% if result.products %}
+    <div class="guide-match-heading"><h3>A few pieces to consider.</h3><p>Showing {{ result.products|length }} of {{ result.total }} {{ 'match' if result.total == 1 else 'matches' }}</p></div>
+    <div class="product-grid guide-product-grid" data-guide-products>{% for product in result.products %}{{ product_card(product, heading='h3') }}{% endfor %}</div>
+    <p class="guide-next">Found a favorite? Save it to your Closet to compare pieces or build an outfit.</p>
+    <a class="guide-refine-link" href="#guide-query">Refine this search <span aria-hidden="true">&uarr;</span></a>
+    {% elif result.query and not result.needs_currency and result.action == 'search' %}<div class="guide-no-matches"><h3>A different detail might do it.</h3><p>Try a different color, remove a budget, or browse the full collection.</p><a class="button secondary-button" href="{{ url_for('products.product_catalog') }}">Browse Discover <span aria-hidden="true">&rarr;</span></a></div>
+    {% elif not result.query %}<div class="guide-welcome"><div class="guide-welcome-symbol" aria-hidden="true">✧</div><h3>A moment. A color. A feeling.</h3><p>Start with the details you know. Your matching catalog pieces will appear here.</p><div><span>01 &nbsp; Describe it</span><span>02 &nbsp; Explore it</span><span>03 &nbsp; Make it yours</span></div></div>{% endif %}
+    {% endif %}
+</section>
+</div>
+</div>
+<p class="guide-status" role="status" aria-live="polite" data-guide-status hidden></p>
+{% endblock %}
