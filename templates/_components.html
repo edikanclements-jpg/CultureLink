@@ -1,3 +1,4 @@
+{% from '_score_explainer.html' import score_explainer %}
 {% macro product_image(product, eager=false) -%}
 <div class="photo-frame">
     {% if product and product.image_url %}
@@ -60,6 +61,7 @@
         <p class="culture-tag">{{ boutique.cultures|join(' · ') or 'Culture not provided' }}</p>
         <{{ heading }} class="product-title"><a href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}">{{ boutique.boutique_name }}</a></{{ heading }}>
         <p class="seller-location">{{ boutique.location or 'Location not provided' }}</p>
+        {{ score_explainer(boutique) }}
         <p class="hint">{{ boutique.product_count }} {{ 'piece' if boutique.product_count == 1 else 'pieces' }} in this catalog</p>
         <a class="text-link" href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}">View seller <span aria-hidden="true">→</span></a>
     </div>

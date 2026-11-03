@@ -1,0 +1,26 @@
+{% from '_score_explainer.html' import score_explainer %}
+{% set evidence = boutique.verification %}
+<section class="instagram-evidence verification-evidence" id="seller-verification" aria-labelledby="verification-heading" data-verification-score="{{ evidence.score }}">
+    <div class="instagram-heading-row">
+        <div><p class="eyebrow">CULTURELINK PUBLIC-EVIDENCE REVIEW</p><h2 id="verification-heading">Seller verification</h2></div>
+        {% if evidence.account %}<a href="{{ evidence.account.url }}" target="_blank" rel="noopener noreferrer">@{{ evidence.account.handle }} <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+    <div class="instagram-score-row">
+        {{ score_explainer(boutique, 'detail') }}
+        <div><p class="instagram-state">{{ evidence.tier }}{% if evidence.review_due %} · Review due{% endif %}</p><p class="hint">{{ evidence.documented_checks }} of {{ evidence.total_checks }} checks documented. This score measures available evidence, not the probability of a safe purchase.</p></div>
+    </div>
+    <div class="verification-categories" aria-label="Verification score breakdown">
+        {% for category in evidence.categories %}<div class="verification-category" data-verification-category="{{ category.id }}"><h3>{{ category.label }}</h3><p>{{ category.score }} <span>/ {{ category.maximum }}</span></p></div>{% endfor %}
+    </div>
+    <p class="verification-rule">Each documented check earns 10 points. A check without confirmed evidence earns 0 points; that means unknown, not proven false. Every seller receives a numeric score.</p>
+    <p class="verification-rule">{% if evidence.order_records_reviewed %}Redacted order and fulfillment evidence has been reviewed under this checklist.{% else %}Completed-order and payment records have not been reviewed. Public posts, press credits and disclosed policies do not prove sales.{% endif %}</p>
+    {% if evidence.reviewed_on %}<p class="hint instagram-date">Public sources checked: {{ evidence.reviewed_on }} · {{ evidence.public_source_count }} distinct public {{ 'source' if evidence.public_source_count == 1 else 'sources' }} · Project rubric v1{% if evidence.review_due %} · These are the last reviewed findings; refresh the review before treating them as current{% endif %}</p>{% else %}<p class="hint instagram-date">Public evidence has not yet been confirmed. The score still includes any complete catalog records.</p>{% endif %}
+    {% if evidence.followers_label %}<div class="verification-profile-facts"><span>Followers at review: {{ 'About ' if evidence.followers_approximate else '' }}{{ evidence.followers_label }}</span>{% if evidence.post_count is not none %}<span>Posts listed at review: {{ '{:,}'.format(evidence.post_count) }}</span>{% endif %}<span>Follower totals alone earn no points.</span></div>{% endif %}
+    {% for note in evidence.notes %}<p class="verification-policy-note">{{ note }}</p>{% endfor %}
+    <details class="info-accordion instagram-method">
+        <summary>See checks and sources</summary>
+        {% for category in evidence.categories %}<section class="verification-check-group" aria-label="{{ category.label }} checks"><h3>{{ category.label }} · {{ category.score }}/20</h3>
+            <ul class="verification-checks">{% for check in category.checks %}<li><div class="verification-check-head"><strong>{{ check.label }}</strong><span>{{ check.points }}/{{ check.maximum }} · {{ check.state }}</span></div><p>{{ check.note }}</p>{% if check.sources %}<div class="verification-source-links">{% for source in check.sources %}<a href="{{ source.url }}"{% if source.url.startswith('https://') %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ source.label }}{% if source.url.startswith('https://') %} <span aria-hidden="true">↗</span>{% endif %}</a>{% endfor %}</div>{% endif %}</li>{% endfor %}</ul>
+        </section>{% endfor %}
+    </details>
+</section>

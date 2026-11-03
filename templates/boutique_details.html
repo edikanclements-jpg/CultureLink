@@ -21,6 +21,7 @@
     </dl>
     <details class="info-accordion seller-delivery"><summary>Production, shipping &amp; alterations</summary>{% if boutique.lead_time or boutique.shipping_regions %}{% if boutique.lead_time %}<p><strong>Typical lead time:</strong> {{ boutique.lead_time }}</p>{% endif %}{% if boutique.shipping_regions %}<p><strong>Delivery areas:</strong> {{ boutique.shipping_regions }}</p>{% endif %}<p>Confirm timing and any alterations directly with the seller.</p>{% else %}<p>These details have not been provided. Confirm them directly with the seller before making a purchase.</p>{% endif %}</details>
 </section>
+{% include '_instagram_evidence.html' %}
 <section class="seller-collection" aria-labelledby="collection-heading">
     <div class="section-heading"><h2 id="collection-heading">From this seller</h2><p class="result-count" role="status">{{ products|length }} {{ 'piece' if products|length == 1 else 'pieces' }}</p></div>
     {% if products %}<div class="product-grid seller-products">{% for product in products %}{{ product_card(product, heading='h3') }}{% endfor %}</div>{% else %}<div class="empty-state"><h3>No pieces listed yet</h3><p>Explore the rest of the catalog while this seller's collection is being added.</p><a class="button" href="{{ url_for('products.product_catalog') }}">Discover pieces</a></div>{% endif %}

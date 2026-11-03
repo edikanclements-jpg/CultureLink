@@ -14,7 +14,7 @@ HELP = {
     "help": "Tell me a culture, occasion, color, seller, or budget. For example: Indian wedding pieces under USD 150. Turn off Refine these results to start a different search.",
     "price_help": "Price to be determined means the catalog doesn't have a confirmed price. Contact the seller before deciding. I leave unknown prices out of budget matches.",
     "size_help": "Catalog sizes are listing labels, not a fit guarantee. Size to be determined means measurements still need confirmation. Open the piece and confirm sizing with the seller.",
-    "verification_help": "CultureLink's seller verification system is still being developed. A catalog listing does not mean a seller has been verified. You can open the seller's page to review the links currently provided.",
+    "verification_help": "Every seller page shows a public-evidence score out of 100 and the checks behind it. Missing evidence earns 0 points for that check. The score measures documented evidence; it does not guarantee reliability or confirm completed payments. Open the seller's page to see its sources and review date.",
     "unsupported": "I can help you find catalog pieces by culture, occasion, color, size label, seller, location, or budget. Try naming what you'd like. For detailed comparisons, save pieces and use Compare in your Closet.",
 }
 NUMBER = r"(\d[\d,]*(?:\.\d{1,2})?)"

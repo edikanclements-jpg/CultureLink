@@ -1,0 +1,45 @@
+.instagram-evidence { margin: 2.4rem 0; padding: clamp(1.1rem, 3vw, 2rem); border: 1px solid var(--border, #d8c7b0); border-radius: 18px; background: var(--surface, #fff8ed); color: var(--text, #3c140a); }
+.instagram-heading-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .8rem 1.5rem; }
+.instagram-heading-row h2 { margin: .1rem 0 .3rem; font-size: clamp(1.7rem, 4vw, 2.3rem); }
+.instagram-heading-row > a { overflow-wrap: anywhere; }
+.instagram-score-row { display: grid; grid-template-columns: minmax(100px, 150px) 1fr; gap: 1.4rem; align-items: center; margin: 1.5rem 0; }
+.instagram-score { border-right: 1px solid #dfcbb0; padding-right: 1rem; }
+.instagram-score strong { font-size: 3rem; line-height: 1; color: #520301; }
+.instagram-score > span { color: #6a5045; }
+.instagram-score > p { font-size: .8rem; margin: .5rem 0 0; }
+.instagram-state { font-weight: 700; font-size: 1rem; margin: 1rem 0 .4rem; }
+.instagram-score-row .instagram-state { margin-top: 0; }
+.instagram-evidence .hint { color: #684e40; line-height: 1.6; }
+.instagram-indicators { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin: 1.4rem 0; }
+.instagram-indicators > div { padding: .9rem 0; border-top: 1px solid #dfcbb0; min-width: 0; }
+.instagram-indicators dt { color: #684e40; font-size: .78rem; margin-bottom: .45rem; }
+.instagram-indicators dd { margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+.instagram-evidence .instagram-date { font-size: .75rem; }
+.instagram-method { margin-top: 1rem; }
+.instagram-method p, .instagram-sources { font-size: .86rem; line-height: 1.65; }
+.instagram-sources { padding-left: 1.2rem; }
+.instagram-sources li { margin-bottom: .6rem; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .instagram-indicators { grid-template-columns: repeat(2, minmax(0, 1fr)); } .instagram-score-row { grid-template-columns: minmax(85px, 105px) 1fr; gap: 1rem; } .instagram-score strong { font-size: 2.4rem; } }
+@media (max-width: 440px) { .instagram-score-row { grid-template-columns: 1fr; } .instagram-score { border-right: 0; padding-right: 0; display: flex; flex-wrap: wrap; gap: .3rem; align-items: baseline; } .instagram-score > p { flex-basis: 100%; margin-top: .2rem; } }
+@media (prefers-reduced-motion: reduce) { .instagram-evidence { scroll-behavior: auto; } }
+.verification-categories { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .9rem; margin: 1.8rem 0 1.2rem; }
+.verification-category { min-width: 0; padding: .9rem 0; border-top: 1px solid #dfcbb0; }
+.verification-category h3 { font-family: inherit; font-size: .82rem; line-height: 1.5; margin: 0 0 .6rem; color: #684e40; }
+.verification-category p { margin: 0; font-size: 1.2rem; font-weight: 700; }
+.verification-category p span { font-size: .8rem; font-weight: 400; color: #684e40; }
+.verification-rule { margin: .8rem 0; font-size: .86rem; line-height: 1.7; color: #684e40; }
+.verification-check-group { margin: 1.4rem 0; }
+.verification-check-group h3 { font-size: 1.3rem; margin: .5rem 0; }
+.verification-checks { padding-left: 1.2rem; margin: 0; }
+.verification-checks > li { margin: 1rem 0; font-size: .85rem; line-height: 1.6; overflow-wrap: anywhere; }
+.verification-check-head { display: flex; flex-wrap: wrap; gap: .3rem .7rem; justify-content: space-between; }
+.verification-check-head span { white-space: nowrap; color: #684e40; }
+.verification-checks p { margin: .3rem 0; }
+.verification-source-links { display: flex; flex-wrap: wrap; gap: .4rem 1rem; font-size: .78rem; }
+.verification-source-links a { overflow-wrap: anywhere; }
+.verification-policy-note { padding: .8rem 1rem; margin: .7rem 0; border-left: 3px solid #aa4c2f; background: #f7ecdb; font-size: .83rem; line-height: 1.6; }
+.verification-profile-facts { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; font-size: .8rem; color: #684e40; margin: 1rem 0; }
+.seller-evidence-preview { display: flex; flex-wrap: wrap; gap: .4rem .8rem; align-items: baseline; margin: .8rem 0; font-size: .8rem; color: #684e40; }
+.seller-evidence-preview strong { color: #520301; font-size: 1.15rem; }
+.seller-evidence-preview strong span { font-size: .78rem; font-weight: 400; }
+@media (max-width: 800px) { .verification-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

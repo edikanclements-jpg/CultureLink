@@ -1,8 +1,7 @@
-"""Akhil's seller-directory and seller-detail routes."""
+"""Seller directory and seller pages with optional public Instagram snapshots."""
 
 from flask import Blueprint, abort, render_template, request
 from services.boutiques import get_all_boutiques, get_boutique_by_id
-
 
 boutiques_bp = Blueprint("boutiques", __name__)
 
