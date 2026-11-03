@@ -1,4 +1,4 @@
-/* Setup stays on one document; every form still works without JavaScript. */
+/* Role/buyer setup is animated. Seller submission opens a fresh document. */
 (() => {
     document.documentElement.classList.add('setup-motion');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -130,6 +130,7 @@
     document.addEventListener('submit', async event => {
         const form = event.target;
         if (!(form instanceof HTMLFormElement) || !form.matches('[data-onboarding-form]') || event.defaultPrevented) return;
+        if (form.hasAttribute('data-full-page-submit')) return;
         const action = new URL(form.action, window.location.href);
         if (action.origin !== window.location.origin) return;
         event.preventDefault();

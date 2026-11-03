@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 {% from 'onboarding/_fields.html' import field, text_area, address_fields, setup_heading, error_summary %}
+{% from '_profile_images.html' import photo_field %}
 {% block title %}Seller Profile | CultureLink{% endblock %}
 {% block page_class %}profile-page{% endblock %}
 {% block content %}
 <div class="profile-shell">
     {{ setup_heading('seller', completed) }}
     <p class="profile-intro">Introduce your business and what makes your collection yours.</p>
+    <p class="hint">Your business application is reviewed by the CultureLink team. Review usually takes 3–6 business days, and you can prepare your pieces in Seller Studio while you wait.</p>
+    {% if completed %}<p class="hint">Changing an approved business's name, social page, or home location starts another application review.</p>{% endif %}
     <p class="hint">Fields marked * are required.</p>
     {{ error_summary(errors) }}
-    <form method="post" action="{{ url_for('onboarding.seller_profile') }}" class="profile-form" data-onboarding-form="profile" data-setup-recovery="{{ url_for('auth.account') }}">
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('onboarding.seller_profile') }}" class="profile-form" data-onboarding-form="profile" data-full-page-submit data-setup-recovery="{{ url_for('auth.account') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <section class="profile-section" aria-labelledby="seller-business">
             <div class="profile-section-heading"><span class="section-number" aria-hidden="true">01</span><div><h2 id="seller-business">Meet your business.</h2><p>Your account email is {{ g.user.email }}.</p></div></div>
@@ -20,6 +23,8 @@
                 <div class="span-two">{{ field('social_url', 'Social page', values, errors, type='url', placeholder='https://instagram.com/your-business') }}</div>
                 <div class="span-two">{{ text_area('description', 'About your business', values, errors, hint='Tell buyers about your craft, your story, and what you offer.') }}</div>
             </div>
+            {{ photo_field('logo', 'Business logo', 'Shown on your public seller page and seller cards. The whole logo stays visible.', account_photos.get('logo'), errors, 'logo') }}
+            {{ photo_field('portrait', 'Owner picture', 'Shown in Meet the owner! at the end of your public seller page and in your account.', account_photos.get('portrait'), errors, 'portrait') }}
         </section>
         <section class="profile-section" aria-labelledby="seller-collection">
             <div class="profile-section-heading"><span class="section-number" aria-hidden="true">02</span><div><h2 id="seller-collection">What do you create?</h2><p>Separate multiple choices with commas.</p></div></div>

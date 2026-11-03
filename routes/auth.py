@@ -5,8 +5,8 @@ import hmac
 import re
 
 from flask import (
-    Blueprint, current_app, flash, g, redirect, render_template, request,
-    session, url_for,
+    Blueprint, abort, current_app, flash, g, redirect, render_template, request,
+    send_file, session, url_for,
 )
 from mysql.connector import Error, IntegrityError, errorcode
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -14,6 +14,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from services.accounts import create_account, find_user_by_email, find_user_by_id
 from services.account_security import csrf_token
 from services.profiles import completed_profile_kind, get_buyer_profile, get_seller_profile
+from services.profile_images import account_images, image_path, initials
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -43,7 +44,13 @@ def _message(title, message, status):
 
 @auth_bp.app_context_processor
 def account_template_helpers():
-    return {"csrf_token": csrf_token}
+    pictures = {}
+    if getattr(g, "user", None):
+        try:
+            pictures = account_images(g.user["user_id"], g.user["role"])
+        except (OSError, ValueError):
+            current_app.logger.warning("Could not load account pictures.")
+    return {"csrf_token": csrf_token, "account_photos": pictures, "picture_initials": initials}
 
 
 @auth_bp.before_app_request
@@ -75,6 +82,11 @@ def load_signed_in_user():
 def protect_account_forms():
     if request.method != "POST":
         return None
+    picture_form = (request.endpoint in {"onboarding.buyer_profile", "onboarding.seller_profile", "onboarding.seller.item_new", "onboarding.seller.item_edit"}
+                    and request.mimetype == "multipart/form-data")
+    limit = 11 * 1024 * 1024 if picture_form else 128 * 1024
+    if request.content_length is not None and request.content_length > limit:
+        return _message("This upload is too large", "Choose pictures under 5 MB each, then return to your profile and try again.", 413)
     expected = session.get("_csrf_token")
     submitted = request.form.get("csrf_token", "")
     if (
@@ -221,6 +233,8 @@ def login():
 @auth_bp.route("/account")
 @login_required
 def account():
+    if g.user["role"] == "admin":
+        return redirect(url_for("onboarding.seller.review_queue"))
     profile = None
     account_type = None
     if g.user["role"] in {"pending", "customer", "seller"}:
@@ -232,7 +246,32 @@ def account():
         except Error:
             current_app.logger.warning("Could not load profile storage. Check sql/02_buyer_seller_profiles.sql has been run.")
             return _message("Please try again shortly", "We couldn't load your profile right now. Please try again in a moment.", 503)
-    return render_template("auth/account.html", profile=profile, account_type=account_type)
+    application = None
+    if account_type == "seller":
+        from services.seller_reviews import application_for
+        try:
+            application = application_for(g.user["user_id"])
+        except Error:
+            return _message("Please try again shortly", "We couldn't load your seller application. Please try again shortly.", 503)
+    return render_template("auth/account.html", profile=profile, account_type=account_type,
+                           application=application)
+
+
+@auth_bp.route("/account/images/<kind>")
+@login_required
+def account_image(kind):
+    allowed = {"avatar"} if g.user["role"] == "customer" else {"logo", "portrait"} if g.user["role"] == "seller" else set()
+    if kind not in allowed:
+        abort(404)
+    try:
+        path = image_path(g.user["user_id"], kind)
+    except (OSError, ValueError):
+        abort(404)
+    if path is None:
+        abort(404)
+    response = send_file(path, mimetype="image/png", conditional=True, max_age=0)
+    response.headers["Cache-Control"] = "private, no-store"
+    return response
 
 
 @auth_bp.route("/logout", methods=["POST"])

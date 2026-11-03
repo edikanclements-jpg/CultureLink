@@ -38,18 +38,19 @@
                         ] %}
                         <div class="field">
                             <label for="{{ key }}">{{ label }}</label>
-                            <select id="{{ key }}" name="{{ key }}">
+                            <select id="{{ key }}" name="{{ key }}"{% if key == 'size' %} aria-describedby="size-help"{% endif %}>
                                 <option value="">{{ any_label }}</option>
                                 {% for value, text in options[key] %}
                                 <option value="{{ value }}"{% if filters[key] == value %} selected{% endif %}>{{ text }}</option>
                                 {% endfor %}
                             </select>
+                            {% if key == 'size' %}<p class="hint" id="size-help">Custom Sizes: final measurements and price are confirmed together.</p>{% endif %}
                         </div>
                         {% endfor %}
 
                         <fieldset class="price-range">
                             <legend>Price range</legend>
-                            <p class="hint" id="price-help">Choose a currency for price filters. Unknown prices are excluded from price filters.</p>
+                            <p class="hint" id="price-help">Choose a currency for fixed-price filters. Custom-size and other unpriced pieces are excluded.</p>
                             <div class="price-fields">
                                 <div class="field">
                                     <label for="min_price">Minimum</label>
@@ -89,9 +90,9 @@
                 </div>
                 {% else %}
                 <div class="empty-state">
-                    <h2>{{ 'Check your filters' if errors else 'No pieces found' }}</h2>
-                    <p>{{ 'Correct the filter information above and try again.' if errors else 'Try another search or clear your filters to explore all pieces.' }}</p>
-                    <a class="button" href="{{ url_for('products.product_catalog') }}">Clear filters</a>
+                    <h2>{{ 'Check your filters' if errors else 'Custom pricing works differently' if custom_price_restricted else 'No pieces found' }}</h2>
+                    <p>{{ 'Correct the filter information above and try again.' if errors else 'Custom-size pieces do not have fixed prices. Clear the currency and price limits to see them.' if custom_price_restricted else 'Try another search or clear your filters to explore all pieces.' }}</p>
+                    <a class="button" href="{{ custom_price_url if custom_price_restricted and not errors else url_for('products.product_catalog') }}">{{ 'Show custom-size pieces' if custom_price_restricted and not errors else 'Clear filters' }}</a>
                 </div>
                 {% endif %}
             </section>

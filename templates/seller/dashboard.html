@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% from 'seller/_status.html' import review_status %}
+{% from 'seller/_history.html' import review_history %}
+{% from 'seller/_pieces.html' import piece_list %}
+{% from 'onboarding/_fields.html' import error_summary %}
+{% block title %}Seller Studio | CultureLink{% endblock %}
+{% block content %}
+<div class="seller-workspace">
+    <div class="review-page-heading"><div><p class="eyebrow">YOUR SELLER STUDIO</p><h1>{{ application.business_name }}</h1><p>Build your collection. Follow your application.</p></div><a class="button secondary-button" href="{{ url_for('onboarding.seller_profile') }}">Edit business profile</a></div>
+    {{ error_summary(errors) }}
+    {{ review_status(application) }}
+    <section class="studio-pieces" aria-labelledby="studio-pieces-heading">
+        <div class="section-heading"><div><h2 id="studio-pieces-heading">Your pieces</h2><p class="hint">{{ 'Updates to your saved pieces appear in the catalog.' if application.status == 'approved' else 'Your pieces are visible only to you and the CultureLink review team until approval.' }}</p></div><a class="button" href="{{ url_for('onboarding.seller.item_new') }}">Add a piece <span aria-hidden="true">+</span></a></div>
+        {{ piece_list(pieces,application.status == 'approved') }}
+        {% if application.status == 'approved' %}<p><a class="text-link" href="{{ url_for('boutiques.boutique_details',boutique_id=application.seller_id) }}">View your public seller page <span aria-hidden="true">→</span></a></p>{% endif %}
+    </section>
+    {% if application.status == 'rejected' %}
+    <section class="review-panel" aria-labelledby="appeal-heading"><p class="eyebrow">ASK FOR ANOTHER REVIEW</p><h2 id="appeal-heading">Make your appeal.</h2><p>Explain how you addressed the team's reasons. Your current business profile and all saved pieces are included as supporting information.</p>
+        <form method="post" action="{{ url_for('onboarding.seller.submit_appeal') }}" class="profile-form review-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="version" value="{{ application.version }}">
+            <label for="appeal-text">What changed? *</label><textarea id="appeal-text" name="appeal_text" rows="6" minlength="30" maxlength="3000" required aria-describedby="appeal-help">{{ appeal_text }}</textarea><p id="appeal-help" class="hint">Address each reason in 30–3,000 characters.</p>
+            <label for="appeal-links">Supporting links <span class="photo-optional">Optional</span></label><textarea id="appeal-links" name="appeal_links" rows="3" maxlength="2504" placeholder="https://your-business.com/about">{{ appeal_links }}</textarea><p class="hint">Up to five complete links, one per line.</p>
+            <button type="submit">Submit appeal <span aria-hidden="true">→</span></button>
+        </form>
+    </section>
+    {% elif application.status == 'appeal_pending' %}<section class="review-panel"><h2>Your submitted appeal</h2><p class="preserve-lines">{{ application.appeal_text }}</p>{% for link in application.links %}<p><a href="{{ link }}" target="_blank" rel="noopener noreferrer">{{ link }}</a></p>{% endfor %}<p class="hint">You can keep updating your pieces while the team reviews your appeal.</p></section>{% endif %}
+    {{ review_history(events) }}
+</div>
+{% endblock %}

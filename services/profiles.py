@@ -3,6 +3,8 @@
 from decimal import Decimal
 from mysql.connector import Error, errorcode
 from database import get_db_connection
+from services.seller_review_schema import ensure_schema
+from services.seller_reviews import profile_saved
 
 
 class ProfileAccessError(ValueError):
@@ -172,6 +174,7 @@ def save_buyer_profile(user_id, values):
 
 
 def save_seller_profile(user_id, values):
+    ensure_schema()
     connection = get_db_connection()
     cursor = None
     try:
@@ -182,8 +185,12 @@ def save_seller_profile(user_id, values):
         location = ", ".join(values[name] for name in ["city", "state", "country"] if values.get(name))
         public_values = (values["business_name"], values.get("website_url") or None,
                          values.get("social_url") or None, values.get("description") or None, location)
+        identity_changed = False
         if existing is not None:
             seller_id = existing["seller_id"]
+            cursor.execute("SELECT seller_name, social_url, location FROM sellers WHERE seller_id = %s", (seller_id,))
+            previous = cursor.fetchone()
+            identity_changed = (previous["seller_name"], previous["social_url"] or "", previous["location"] or "") != (values["business_name"], values.get("social_url") or "", location)
             cursor.execute("UPDATE sellers SET seller_name = %s, website_url = %s, social_url = %s, description = %s, location = %s WHERE seller_id = %s", public_values + (seller_id,))
         else:
             cursor.execute("INSERT INTO sellers (seller_name, website_url, social_url, description, location) VALUES (%s, %s, %s, %s, %s)", public_values)
@@ -197,6 +204,7 @@ def save_seller_profile(user_id, values):
             cursor.execute("INSERT INTO seller_profiles (user_id, seller_id, " + ", ".join(fields) + ") VALUES ("
                            + ", ".join(["%s"] * (len(fields) + 2)) + ")", (user_id, seller_id) + data)
         _save_default_address(cursor, user_id, values, seller=True)
+        profile_saved(cursor, user_id, seller_id, recheck=identity_changed)
         connection.commit()
         return seller_id
     except Exception:
@@ -213,7 +221,7 @@ def public_seller_profiles(seller_id=None):
     cursor = None
     try:
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT seller_id, cultures, occasions, clothing_types, lead_time, price_info, shipping_regions, verification_status FROM seller_profiles"
+        query = "SELECT user_id, seller_id, cultures, occasions, clothing_types, lead_time, price_info, shipping_regions, verification_status FROM seller_profiles"
         parameters = ()
         if seller_id is not None:
             query += " WHERE seller_id = %s"

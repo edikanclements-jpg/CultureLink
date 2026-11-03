@@ -1,0 +1,20 @@
+{% macro profile_picture(src=none, label='', variant='avatar', letters='') -%}
+<span class="profile-picture profile-picture--{{ variant }}">
+    {% if src %}<img src="{{ src }}" alt="{{ label }}" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">{% endif %}
+    <span class="picture-fallback" aria-hidden="true"{% if src %} hidden{% endif %}>{% if letters %}{{ letters }}{% else %}<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="11" r="5"/><path d="M6 28v-3a10 10 0 0 1 20 0v3"/></svg>{% endif %}</span>
+</span>
+{%- endmacro %}
+
+{% macro photo_field(kind, title, hint, src, errors, variant='avatar') -%}
+<div class="photo-field" data-photo-field>
+    <div class="photo-field-preview" data-photo-preview>{{ profile_picture(src, title, variant) }}</div>
+    <div class="photo-field-controls">
+        <label for="photo-{{ kind }}">{{ title }} <span class="photo-optional">Optional</span></label>
+        <p class="hint" id="photo-{{ kind }}-help">{{ hint }} PNG, JPG, or WebP, up to 5 MB.</p>
+        <input type="file" id="photo-{{ kind }}" name="photo_{{ kind }}" accept="image/png,image/jpeg,image/webp" aria-describedby="photo-{{ kind }}-help{% if errors.get('photo_' ~ kind) %} error-photo_{{ kind }}{% endif %}"{% if errors.get('photo_' ~ kind) %} aria-invalid="true"{% endif %} data-photo-input>
+        {% if errors.get('photo_' ~ kind) %}<p class="field-error" id="error-photo_{{ kind }}">{{ errors.get('photo_' ~ kind) }}</p>{% endif %}
+        <p class="photo-preview-status hint" data-photo-status role="status" aria-live="polite"></p>
+        {% if src %}<label class="photo-remove"><input type="checkbox" name="remove_{{ kind }}" value="1" data-photo-remove> Remove current picture when I save</label>{% endif %}
+    </div>
+</div>
+{%- endmacro %}

@@ -67,7 +67,9 @@ def configure_account_security(app):
     )
     # Local HTTP needs Secure=False. Enable SESSION_COOKIE_SECURE for future HTTPS hosting.
     if app.config.get("MAX_CONTENT_LENGTH") is None:
-        app.config["MAX_CONTENT_LENGTH"] = 128 * 1024
+        # Two optional 5 MB pictures plus normal profile fields. The account
+        # request guard keeps all other forms at their existing 128 KB limit.
+        app.config["MAX_CONTENT_LENGTH"] = 11 * 1024 * 1024
     app.extensions["account_attempts"] = AttemptLimiter()
     app.extensions["account_dummy_hash"] = generate_password_hash(
         secrets.token_urlsafe(32), method="scrypt:32768:8:1"

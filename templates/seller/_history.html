@@ -1,0 +1,19 @@
+{% macro review_history(events, team=false) -%}
+<section class="review-history" aria-labelledby="history-heading">
+    <h2 id="history-heading">Application history</h2>
+    {% for event in events %}
+    <article class="review-event">
+        <div class="review-event-heading"><h3>{{ {'submitted':'Application received','approved':'Application approved','rejected':'Application not approved','appealed':'Appeal received'}.get(event.kind, 'Application updated') }}</h3><span class="hint">{{ event.created_at }}</span></div>
+        {% if event.reason_labels %}<ul>{% for reason in event.reason_labels %}<li>{{ reason }}</li>{% endfor %}</ul>{% endif %}
+        {% if event.notes %}<p class="preserve-lines">{{ event.notes }}</p>{% endif %}
+        {% if team %}
+        <details><summary>Information saved with this step</summary>
+            {% if event.snapshot.get('profile') %}<dl class="review-snapshot">{% for key,label in [('seller_name','Business name'),('location','Location'),('social_url','Social page'),('contact_name','Contact name'),('cultures','Cultures'),('lead_time','Production timing'),('price_info','Price guide'),('shipping_regions','Delivery areas')] %}<div><dt>{{ label }}</dt><dd>{{ event.snapshot.profile.get(key) or 'Not added' }}</dd></div>{% endfor %}</dl>{% endif %}
+            <p><strong>{{ event.snapshot.get('pieces',[])|length }} saved {{ 'piece' if event.snapshot.get('pieces',[])|length == 1 else 'pieces' }}</strong> at this step.</p>
+            {% if event.snapshot.get('pieces') %}<ul>{% for piece in event.snapshot.pieces %}<li>{{ piece.item_name }} · {{ piece.size }} · {{ piece.price_notes }}</li>{% endfor %}</ul>{% endif %}
+        </details>
+        {% endif %}
+    </article>
+    {% else %}<p>No decisions yet.</p>{% endfor %}
+</section>
+{%- endmacro %}

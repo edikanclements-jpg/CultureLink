@@ -4,12 +4,15 @@ import re
 from urllib.parse import urlsplit
 
 from database import get_db_connection
+from services.catalog_rules import canonical_size, has_custom_size, seller_location, SELLER_LOCATION_SQL
+from services.seller_timing import timing_for
+from services.seller_review_schema import PUBLIC_SELLER_SQL
 
 
 INR_PATTERN = r"(^|[^A-Z])INR([^A-Z]|$)"
 USD_PATTERN = r"(^|[^A-Z])USD([^A-Z]|$)"
 
-PRODUCT_SELECT = """
+PRODUCT_SELECT = f"""
     SELECT
         i.item_id AS product_id,
         i.item_name AS product_name,
@@ -23,7 +26,7 @@ PRODUCT_SELECT = """
         i.size,
         i.seller_id AS boutique_id,
         s.seller_name AS boutique_name,
-        s.location AS seller_location,
+        {SELLER_LOCATION_SQL} AS seller_location,
         s.website_url AS seller_website_url,
         s.social_url AS seller_social_url,
         c.culture_name AS culture,
@@ -33,7 +36,7 @@ PRODUCT_SELECT = """
             SEPARATOR ', '
         ) AS occasion
     FROM items i
-    JOIN sellers s ON i.seller_id = s.seller_id
+    JOIN sellers s ON i.seller_id = s.seller_id AND {PUBLIC_SELLER_SQL}
     JOIN cultures c ON i.culture_id = c.culture_id
     LEFT JOIN itemoccasions io ON i.item_id = io.item_id
     LEFT JOIN occasions o ON io.occasion_id = o.occasion_id
@@ -62,7 +65,16 @@ def currency_for(product):
 
 def format_product(product):
     """Add presentation labels while retaining the original values and IDs."""
-    product["price_currency"] = currency_for(product)
+    product["size"] = canonical_size(product.get("size"))
+    product["custom_size"] = has_custom_size(product["size"])
+    product["display_size"] = product["size"] or "Size to be determined"
+    product["seller_location"] = seller_location(product.get("boutique_id"), product.get("boutique_name"), product.get("seller_location"))
+    product["price_currency"] = "" if product["custom_size"] else currency_for(product)
+    if product["custom_size"]:
+        # This changes the public projection, not the database's recorded price.
+        # Budget searches and seller ranges must also treat this as a quote.
+        product["price"] = None
+        product["price_notes"] = "Custom sizing and final pricing will be confirmed together. Price to be determined."
     price = product.get("price")
     if price is None or price <= 0:
         product["display_price"] = "Price to be determined"
@@ -70,14 +82,14 @@ def format_product(product):
         product["display_price"] = f"{product['price_currency']} {price:,.2f}"
     else:
         product["display_price"] = f"{price:,.2f} (currency not provided)"
-    size = (product.get("size") or "").strip()
-    unknown_sizes = {"", "to be measured", "to be determined", "unknown", "not specified"}
-    product["display_size"] = "Size to be determined" if size.casefold() in unknown_sizes else size
     product["storefront_url"] = (
         safe_http_url(product.get("purchase_url"))
         or safe_http_url(product.get("seller_website_url"))
         or safe_http_url(product.get("seller_social_url"))
     )
+    product["timing"] = timing_for(product.get("boutique_id"), product.get("boutique_name"))
+    for key, label in (("display_production_time", "production_label"), ("display_shipping_time", "shipping_label"), ("display_total_time", "total_label")):
+        product[key] = product["timing"][label] if product["timing"] else "Confirm timing"
     return product
 
 

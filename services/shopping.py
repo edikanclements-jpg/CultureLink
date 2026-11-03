@@ -7,13 +7,14 @@ from flask import current_app
 from services.account_security import AttemptLimiter
 from services.products import get_all_products
 from services import shopping_ai
+from services.catalog_rules import canonical_size, matches_size, canonical_location_query
 
 TEXT_FIELDS = shopping_ai.FILTER_TEXT
 PRICE_FIELDS = ("min_price", "max_price")
 HELP = {
-    "help": "Tell me a culture, occasion, color, seller, or budget. For example: Indian wedding pieces under USD 150. Turn off Refine these results to start a different search.",
-    "price_help": "Price to be determined means the catalog doesn't have a confirmed price. Contact the seller before deciding. I leave unknown prices out of budget matches.",
-    "size_help": "Catalog sizes are listing labels, not a fit guarantee. Size to be determined means measurements still need confirmation. Open the piece and confirm sizing with the seller.",
+    "help": "Tell me a culture, occasion, color, seller, or budget. For example: Indian wedding pieces under USD 500. Turn off Refine these results to start a different search.",
+    "price_help": "Custom Sizes and Price to be determined go together: final sizing and pricing are confirmed together. Custom-size and other unpriced pieces are left out of fixed-price budget matches.",
+    "size_help": "Custom Sizes includes pieces labeled custom sizes or to be measured. These show Price to be determined because final sizing and pricing are confirmed together. Other size labels are not a fit guarantee.",
     "verification_help": "Every seller page shows a public-evidence score out of 100 and the checks behind it. Missing evidence earns 0 points for that check. The score measures documented evidence; it does not guarantee reliability or confirm completed payments. Open the seller's page to see its sources and review date.",
     "unsupported": "I can help you find catalog pieces by culture, occasion, color, size label, seller, location, or budget. Try naming what you'd like. For detailed comparisons, save pieces and use Compare in your Closet.",
 }
@@ -40,6 +41,9 @@ def validate_filters(value):
         if not isinstance(text, str) or len(text) > 100 or any(ord(char) < 32 or ord(char) == 127 for char in text):
             raise GuideInputError("Please use short, normal search terms.")
         result[key] = text.strip()
+    if result["size"]:
+        result["size"] = canonical_size(result["size"]) or result["size"]
+    result["location"] = canonical_location_query(result["location"])
     if result["currency"] not in {"", "USD", "INR"}:
         raise GuideInputError("Choose USD or INR for a budget search.")
     for key in PRICE_FIELDS:
@@ -82,6 +86,7 @@ def requested_currency(text):
 
 def local_intent(text, previous, facets):
     lower = text.casefold()
+    lower = re.sub(r"\b(?:custom(?:[ -]+(?:sizes?|sizing))?|made[ -]+to[ -]+measure|to\s+be\s+measured|bespoke)\b", "custom sizes", lower)
     result = dict(previous)
     if re.search(r"\b(tbd|determined|unknown price|price mean)\b", lower):
         return {"action": "price_help", "filters": result}
@@ -101,6 +106,15 @@ def local_intent(text, previous, facets):
     consumed, cleared_budget = re.subn(r"\b(?:(?:no|remove|clear)\s+(?:the\s+)?budget|(?:any|all)\s+prices?)\b", " ", consumed)
     if cleared_budget:
         result.update(min_price=None, max_price=None, currency="")
+    consumed = re.sub(r"\b(?:uk|britain)\b", "united kingdom", consumed)
+    consumed = re.sub(r"\bfrom\s+(?:the\s+)?(?:us|united states(?: of america)?)\b", "from usa", consumed)
+    # Explicit origins such as 'from Nigeria' are locations, not clothing cultures.
+    for origin in sorted(facets["location"], key=len, reverse=True):
+        pattern = r"\bfrom\s+(?:the\s+)?" + re.escape(origin.casefold()) + r"(?!\w)"
+        if re.search(pattern, consumed):
+            result["location"] = origin
+            consumed = re.sub(pattern, " ", consumed)
+            break
     aliases = {"india": "Indian", "nigeria": "Nigerian", "korea": "Korean", "weddings": "Wedding", "festivals": "Festival", "parties": "Party", "dresses": "Dress", "gowns": "Gown", "sari": "Saree", "saris": "Saree", "sarees": "Saree", "lehengas": "Lehenga", "kurtas": "Kurta", "tops": "Top", "skirts": "Skirt", "sets": "Set", "suits": "Suit"}
     for alias, canonical in aliases.items():
         consumed = re.sub(r"(?<!\w)" + re.escape(alias) + r"(?!\w)", canonical.casefold(), consumed)
@@ -158,7 +172,7 @@ def match_products(products, filters):
             continue
         if any(filters[key] and filters[key].casefold() not in (product.get(field) or "").casefold() for key, field in (("color", "color"), ("clothing_type", "clothing_type"), ("location", "seller_location"))):
             continue
-        if filters["size"] and filters["size"].casefold() not in [value.strip().casefold() for value in (product.get("size") or "").split(",")]:
+        if filters["size"] and not matches_size(product.get("size"), filters["size"]):
             continue
         words = filters["keyword"].casefold().split()
         haystack = " ".join(str(product.get(key) or "") for key in ("product_name", "description", "boutique_name", "clothing_type")).casefold()

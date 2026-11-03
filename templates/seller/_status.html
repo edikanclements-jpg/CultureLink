@@ -1,0 +1,19 @@
+{% macro review_status(application) -%}
+<section class="review-status review-status--{{ application.status }}" aria-labelledby="review-status-heading" data-review-status="{{ application.status }}">
+    <p class="eyebrow">SELLER APPLICATION <span class="review-pill">{{ application.label }}</span></p>
+    {% if application.status == 'approved' %}
+    <h2 id="review-status-heading">You're ready to share.</h2>
+    <p>Your seller page and pieces are available in CultureLink. You can keep your collection up to date from Seller Studio.</p>
+    {% elif application.status == 'rejected' %}
+    <h2 id="review-status-heading">Here's what needs attention.</h2>
+    <p>Your application wasn't approved. Your profile, photos, and pieces are saved. Correct these issues, then submit an appeal.</p>
+    <ul class="review-reasons">{% for reason in application.reason_labels %}<li>{{ reason }}</li>{% endfor %}</ul>
+    {% if application.reviewer_notes %}<p class="review-team-note"><strong>Team notes:</strong> {{ application.reviewer_notes }}</p>{% endif %}
+    {% else %}
+    <h2 id="review-status-heading">{{ 'Your appeal is with our team.' if application.status == 'appeal_pending' else 'Your application is with our team.' }}</h2>
+    <p>Review usually takes <strong>3–6 business days</strong>, Monday–Friday. You can add pieces, photos, sizes, and prices while you wait.</p>
+    <p class="hint">Expected review window: {{ application.review_from }} – {{ application.review_until }}. This is an estimate, and the team makes the final decision.</p>
+    {% endif %}
+    <p class="hint">Your status and any review notes appear here in Seller Studio.</p>
+</section>
+{%- endmacro %}

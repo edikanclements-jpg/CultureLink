@@ -2,9 +2,10 @@
 
 from decimal import Decimal, InvalidOperation
 
-from flask import Blueprint, abort, render_template, request
+from flask import Blueprint, abort, render_template, request, url_for
 from services.products import get_all_products, get_product_by_id
 from services.search import SORTS, search_products
+from services.catalog_rules import canonical_size, size_labels, STANDARD_SIZES, CUSTOM_SIZE, canonical_location_query
 
 
 products_bp = Blueprint("products", __name__)
@@ -31,10 +32,8 @@ def _values(products, key, split=False):
 
 def _filter_options(products):
     """Build choices from the actual catalog rather than invented sample values."""
-    sizes = _values(products, "size", split=True)
-    unknown_sizes = {"to be measured", "to be determined", "unknown", "not specified"}
-    sizes = [size for size in sizes if size.casefold() not in unknown_sizes]
-    size_order = {size: index for index, size in enumerate(["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"])}
+    sizes = sorted({label for product in products for label in size_labels(product.get("size"))})
+    size_order = {size: index for index, size in enumerate(STANDARD_SIZES)}
     sizes.sort(key=lambda size: (size_order.get(size, 100), size.casefold()))
     locations = [(value, value) for value in _values(products, "seller_location")]
     if any(not (product.get("seller_location") or "").strip() for product in products):
@@ -69,6 +68,10 @@ def product_catalog():
     """Show Discover and apply the submitted filters through Python."""
     keys = ("keyword", "culture", "occasion", "size", "color", "location", "currency", "min_price", "max_price")
     filters = {key: request.args.get(key, "").strip() for key in keys}
+    # Keep old bookmarked size links working, with the canonical option selected.
+    if filters["size"]:
+        filters["size"] = canonical_size(filters["size"]) or filters["size"]
+    filters["location"] = canonical_location_query(filters["location"])
     filters["sort"] = request.args.get("sort", "name_asc").strip()
     errors = []
     min_price = _read_price(filters["min_price"], "Minimum price", errors)
@@ -85,6 +88,9 @@ def product_catalog():
         errors.append("Minimum price must be less than or equal to maximum price.")
 
     catalog = get_all_products()
+    custom_price_restricted = filters["size"] == CUSTOM_SIZE and bool(filters["currency"] or price_filter or price_sort)
+    custom_filters = {key: value for key, value in filters.items() if value and key not in {"currency", "min_price", "max_price", "sort"}}
+    custom_filters["sort"] = "name_asc" if price_sort else filters["sort"]
     if errors:
         products = []
     else:
@@ -98,6 +104,8 @@ def product_catalog():
     return render_template(
         "products.html", products=products, filters=filters,
         options=_filter_options(catalog), errors=errors, sort_labels=SORT_LABELS,
+        custom_price_restricted=custom_price_restricted,
+        custom_price_url=url_for('products.product_catalog', **custom_filters),
     )
 
 

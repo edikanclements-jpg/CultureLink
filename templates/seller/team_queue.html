@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Seller Reviews | CultureLink{% endblock %}
+{% block content %}
+<div class="seller-workspace"><p class="eyebrow">CULTURELINK TEAM</p><h1>Seller reviews.</h1><p>Review business applications and appeals. Decisions are separate from the public Evidence score.</p>
+<form method="get" class="review-queue-filter"><label for="review-filter">Show</label><select name="status" id="review-filter">{% for key,label in review_statuses.items() %}<option value="{{ key }}"{% if selected_status == key %} selected{% endif %}>{{ label }}</option>{% endfor %}<option value="all"{% if selected_status == 'all' %} selected{% endif %}>All applications</option></select><button type="submit">Apply</button></form>
+<div class="review-queue">{% for application in applications %}<article class="review-queue-card"><div><p class="review-pill">{{ application.label }}</p><h2>{{ application.business_name }}</h2><p>{{ application.email }}</p><p class="hint">Expected review: {{ application.review_from }} – {{ application.review_until }}</p></div><a class="button secondary-button" href="{{ url_for('onboarding.seller.review_detail',user_id=application.user_id) }}">Review application <span aria-hidden="true">→</span></a></article>{% else %}<div class="empty-state"><h2>You're up to date.</h2><p>No applications match this status.</p></div>{% endfor %}</div>
+</div>
+{% endblock %}

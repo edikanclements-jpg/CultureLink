@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% from '_components.html' import product_image, closet_control with context %}
+{% from '_seller_timing.html' import timing_panel %}
 {% block title %}{{ product.product_name }} | CultureLink{% endblock %}
 {% block page_class %}item-page{% endblock %}
 {% block content %}
@@ -17,6 +18,7 @@
             <div><dt>Clothing type</dt><dd>{{ product.clothing_type or 'Not provided' }}</dd></div>
             <div><dt>Seller location</dt><dd>{{ product.seller_location or 'Not provided' }}</dd></div>
         </dl>
+        {% if product.custom_size %}<p class="hint">Custom sizing and final pricing will be confirmed together.</p>{% endif %}
         <div class="detail-actions">
             {{ closet_control(product) }}
             <a class="button" href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">View seller <span aria-hidden="true">→</span></a>
@@ -24,7 +26,7 @@
         </div>
         {% if not product.storefront_url %}<p class="hint muted">A storefront link has not been provided for this piece.</p>{% endif %}
         <details class="info-accordion" open><summary>About this piece</summary><p>{{ product.description or 'A description has not been provided.' }}</p></details>
-        <details class="info-accordion"><summary>Fit &amp; delivery</summary><p>Confirm sizing, alterations, production time, and shipping directly with the seller. These details have not been provided in this catalog.</p></details>
+        <details class="info-accordion" data-product-delivery><summary>Fit &amp; delivery{% if product.timing %} · Sample timing{% endif %}</summary>{% if product.timing %}{{ timing_panel(product.timing, 'h3') }}{% endif %}<p>Confirm actual sizing, alterations, production and shipping before ordering. Sample timing is not a delivery promise.</p></details>
         {% if product.price_notes %}<details class="info-accordion"><summary>Price information</summary><p>{{ product.price_notes }}</p></details>{% endif %}
     </div>
 </article>

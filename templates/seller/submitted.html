@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Submitted | CultureLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static',filename='discover.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='seller-review.css',v='simulation-popup-1') }}">
+    <script src="{{ url_for('static',filename='seller-review.js',v='simulation-popup-1') }}" defer></script>
+</head>
+<body class="seller-submission-page">
+    <main id="main-content">
+        <dialog class="seller-submitted-dialog" data-submitted-dialog open aria-labelledby="submitted-heading" aria-describedby="submitted-description">
+            <img class="submitted-brand" src="{{ url_for('static',filename='branding/culturelink-icon.png') }}" alt="CultureLink" width="58" height="58">
+            <p class="eyebrow">APPLICATION RECEIVED</p>
+            <h1 id="submitted-heading">Your application<br>is under review.</h1>
+            <p id="submitted-description">CultureLink will review your seller profile within <strong>3–6 business days</strong>. You can continue setting up your shop and adding pieces while you wait.</p>
+            <a class="button submitted-continue" data-continue-setup href="{{ url_for('onboarding.seller.dashboard') }}">Continue setup <span aria-hidden="true">→</span></a>
+        </dialog>
+    </main>
+</body>
+</html>

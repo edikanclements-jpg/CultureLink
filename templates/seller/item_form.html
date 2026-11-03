@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% from 'onboarding/_fields.html' import field, text_area, error_summary %}
+{% from '_profile_images.html' import profile_picture %}
+{% block title %}{{ 'Edit' if existing else 'Add' }} Piece | CultureLink{% endblock %}
+{% block content %}
+<div class="seller-item-editor"><a class="text-link" href="{{ url_for('onboarding.seller.dashboard') }}">← Back to Seller Studio</a><p class="eyebrow">YOUR COLLECTION</p><h1>{{ 'Refine your piece.' if existing else 'Add a piece.' }}</h1><p>{{ 'This piece is published while your business is approved.' if application.status == 'approved' else 'This piece will stay private until your business is approved.' }}</p>
+{{ error_summary(errors) }}
+<form method="post" enctype="multipart/form-data" class="profile-form review-panel" data-seller-piece-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="request_key" value="{{ request_key }}">{% if existing %}<input type="hidden" name="version" value="{{ existing.version }}">{% endif %}
+    <div class="profile-grid">
+        <div class="span-two">{{ field('item_name','Piece name',values,errors,required=true,maximum=200) }}</div>
+        {{ field('category','Clothing type',values,errors,required=true,maximum=100,placeholder='e.g. Dress, two-piece set') }}
+        {{ field('color','Colors',values,errors,required=true,maximum=100,placeholder='e.g. Burgundy, gold') }}
+        <div class="profile-field"><label for="piece-culture">Culture *</label><select name="culture_id" id="piece-culture" required><option value="">Choose a culture</option>{% for culture in cultures %}<option value="{{ culture.culture_id }}"{% if values.get('culture_id') == culture.culture_id|string %} selected{% endif %}>{{ culture.culture_name }}</option>{% endfor %}</select>{% if errors.culture_id %}<p class="field-error">{{ errors.culture_id }}</p>{% endif %}</div>
+        <div class="profile-field"><label for="piece-size-mode">Sizing *</label><select id="piece-size-mode" name="size_mode" data-piece-size-mode><option value="custom"{% if values.get('size_mode') == 'custom' %} selected{% endif %}>Custom Sizes · price to be determined</option><option value="standard"{% if values.get('size_mode') == 'standard' %} selected{% endif %}>Standard sizes</option></select></div>
+        <div class="span-two">{{ text_area('description','Description',values,errors,maximum=2000,hint='Describe the piece, fabric, fit, and what is included.',required=true) }}</div>
+    </div>
+    <fieldset class="piece-occasions"><legend>Occasions *</legend>{% for occasion in occasions %}<label><input type="checkbox" name="occasion_ids" value="{{ occasion.occasion_id }}"{% if occasion.occasion_id|string in values.get('occasion_ids',[]) %} checked{% endif %}>{{ occasion.occasion_name }}</label>{% endfor %}{% if errors.occasion_ids %}<p class="field-error">{{ errors.occasion_ids }}</p>{% endif %}</fieldset>
+    <p class="hint" data-custom-price-help>Custom sizing and the final price are confirmed together. Custom pieces always show Price to be determined.</p>
+    <div class="profile-grid" data-standard-piece-fields>
+        <div class="span-two">{{ field('size','Standard sizes',values,errors,maximum=100,placeholder='e.g. S, M, L') }}</div>
+        {{ field('price','Fixed price',values,errors,maximum=12,placeholder='e.g. 150.00',hint='Leave blank for Price to be determined.') }}
+        <div class="profile-field"><label for="piece-currency">Currency for fixed price</label><select id="piece-currency" name="currency"><option value="USD"{% if values.get('currency') == 'USD' %} selected{% endif %}>USD · US dollar</option><option value="INR"{% if values.get('currency') == 'INR' %} selected{% endif %}>INR · Indian rupee</option></select>{% if errors.currency %}<p class="field-error">{{ errors.currency }}</p>{% endif %}</div>
+    </div>
+    <div class="photo-field" data-photo-field><div class="photo-field-preview" data-photo-preview>{{ profile_picture(values.get('photo_url'),'Current product photo','portrait') }}</div><div class="photo-field-controls"><label for="photo-item">Product photo{{ ' (optional replacement)' if existing else ' *' }}</label><p class="hint" id="photo-item-help">PNG, JPG, or WebP, up to 5 MB. Use your own clear photo of the complete piece.</p><input type="file" id="photo-item" name="photo_item" accept="image/png,image/jpeg,image/webp" aria-describedby="photo-item-help" data-photo-input{% if not existing %} required{% endif %}>{% if errors.photo_item %}<p class="field-error">{{ errors.photo_item }}</p>{% endif %}<p data-photo-status class="hint" role="status" aria-live="polite"></p></div></div>
+    <div class="profile-form-actions"><p>{{ 'Save to update this published piece.' if application.status == 'approved' else 'Save now. You can make changes while you wait for review.' }}</p><button type="submit">Save piece <span aria-hidden="true">→</span></button></div>
+</form></div>
+{% endblock %}

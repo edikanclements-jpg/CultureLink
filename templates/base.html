@@ -1,3 +1,4 @@
+{% from '_profile_images.html' import profile_picture %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='closet.css', v='closet-1') }}">
     <script src="{{ url_for('static', filename='ui.js') }}" defer></script>
     <script src="{{ url_for('static', filename='accounts.js', v='setup-motion-1') }}" defer></script>
-    <script src="{{ url_for('static', filename='profiles.js', v='setup-motion-1') }}" defer></script>
+    <script src="{{ url_for('static', filename='profiles.js', v='seller-full-submit-1') }}" defer></script>
     <script src="{{ url_for('static', filename='closet.js', v='compare-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='comparison.css', v='compare-1') }}">
     <script src="{{ url_for('static', filename='comparison.js', v='compare-1') }}" defer></script>
@@ -25,21 +26,29 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='score-explainer.css', v='score-help-1') }}">
     <script src="{{ url_for('static', filename='score-explainer.js', v='score-help-1') }}" defer></script>
     <script src="{{ url_for('static', filename='shopping.js', v='guide-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='photo-layout.css', v='compact-photos-1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='timing.css', v='demo-times-1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile-images.css', v='boutique-owners-1') }}">
+    <script src="{{ url_for('static', filename='profile-images.js', v='profile-pictures-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='seller-review.css', v='simulation-popup-1') }}">
+    <script src="{{ url_for('static', filename='seller-review.js', v='simulation-popup-1') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     {% set endpoint = request.endpoint or '' %}
     <header class="site-header">
-        <a class="wordmark" href="{{ url_for('main.home') }}">CultureLink</a>
+        <a class="brand-home" href="{{ url_for('main.home') }}" aria-label="CultureLink home"><img src="{{ url_for('static', filename='branding/culturelink-icon.png', v='brand-1') }}" alt="CultureLink" width="60" height="60"></a>
         <nav aria-label="Main navigation">
             <a href="{{ url_for('main.home') }}"{% if endpoint == 'main.home' %} aria-current="page"{% endif %}>Home</a>
             <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') %} aria-current="page"{% endif %}>Discover</a>
             <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
             {% if g.user and g.user.role == 'customer' %}<a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') and endpoint not in ['closet.assistant','closet.assistant_reset'] %} aria-current="page"{% endif %}>Closet</a><a href="{{ url_for('closet.assistant') }}"{% if endpoint == 'closet.assistant' %} aria-current="page"{% endif %}>Guide</a>{% endif %}
+            {% if g.user and g.user.role == 'seller' %}<a href="{{ url_for('onboarding.seller.dashboard') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Studio</a>{% elif g.user and g.user.role == 'admin' %}<a href="{{ url_for('onboarding.seller.review_queue') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Reviews</a>{% endif %}
         </nav>
         <div class="header-account">
             {% if g.user %}
-            <a href="{{ url_for('auth.account') }}"{% if endpoint == 'auth.account' %} aria-current="page"{% endif %}>My Account</a>
+            {% set avatar_kind = 'avatar' if g.user.role == 'customer' else 'portrait' if account_photos.get('portrait') else 'logo' %}
+            <a class="account-avatar-link" href="{{ url_for('auth.account') }}"{% if endpoint == 'auth.account' %} aria-current="page"{% endif %} aria-label="My Account">{{ profile_picture(account_photos.get(avatar_kind), '', 'logo' if avatar_kind == 'logo' else 'avatar') }}<span>My Account</span></a>
             <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="logout-button">Log Out</button>

@@ -1,0 +1,14 @@
+{% macro timing_panel(timing, heading='h2') -%}
+{% if timing %}
+<section class="demo-timing" aria-label="Sample production and shipping timing" data-demo-timing data-demo-total="{{ timing.total_days }}">
+    <div class="demo-timing-heading"><{{ heading }}>Sample order timing</{{ heading }}><span>Demo estimates</span></div>
+    <p class="demo-timing-route">{{ timing.origin }} <span aria-hidden="true">→</span> US delivery</p>
+    <dl class="demo-timing-values">
+        <div><dt>Make / prepare</dt><dd>{{ timing.production_days }} <span>business days</span></dd></div>
+        <div><dt>Ship</dt><dd>{{ timing.shipping_days }} <span>business days</span></dd></div>
+        <div><dt>Total</dt><dd>{{ timing.total_days }} <span>business days</span></dd></div>
+    </dl>
+    <p class="demo-timing-note">Invented averages for the prototype, not measured seller or carrier times. Total = making + shipping. Business days use Monday–Friday, after order details, measurements and final price are confirmed where needed.</p>
+</section>
+{% endif %}
+{%- endmacro %}

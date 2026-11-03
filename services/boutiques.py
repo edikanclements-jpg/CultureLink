@@ -5,6 +5,9 @@ from services.products import get_all_products, get_products_for_seller, safe_ht
 from services.profiles import public_seller_profiles
 from services.instagram_review import account_for
 from services.seller_verification import review_for
+from services.catalog_rules import seller_location
+from services.seller_timing import timing_for
+from services.profile_images import public_seller_images, initials
 
 
 SELLER_SELECT = """
@@ -15,6 +18,7 @@ SELLER_SELECT = """
 
 
 def _catalog_details(boutique, products, profile=None):
+    boutique["location"] = seller_location(boutique.get("boutique_id"), boutique.get("boutique_name"), boutique.get("location"))
     boutique["products"] = products
     boutique["product_count"] = len(products)
     boutique["cultures"] = sorted({product["culture"] for product in products})
@@ -47,6 +51,9 @@ def _catalog_details(boutique, products, profile=None):
         boutique["shipping_regions"] = profile.get("shipping_regions")
         boutique["verification_status"] = profile.get("verification_status")
     boutique["verification"] = review_for(boutique)
+    boutique["timing"] = timing_for(boutique.get("boutique_id"), boutique.get("boutique_name"))
+    boutique["pictures"] = public_seller_images(boutique["boutique_id"], (profile or {}).get("user_id"), boutique["boutique_name"])
+    boutique["initials"] = initials(boutique["boutique_name"])
     return boutique
 
 
@@ -61,7 +68,8 @@ def get_all_boutiques():
         connection.close()
     products = get_all_products()
     profiles = public_seller_profiles()
-    return [_catalog_details(boutique, [product for product in products if product["boutique_id"] == boutique["boutique_id"]], profiles.get(boutique["boutique_id"])) for boutique in boutiques]
+    return [_catalog_details(boutique, [product for product in products if product["boutique_id"] == boutique["boutique_id"]], profiles.get(boutique["boutique_id"])) for boutique in boutiques
+            if boutique["boutique_id"] not in profiles or profiles[boutique["boutique_id"]].get("verification_status") == "approved"]
 
 
 def get_boutique_by_id(boutique_id):
@@ -75,7 +83,10 @@ def get_boutique_by_id(boutique_id):
         connection.close()
     if boutique is None:
         return None
-    return _catalog_details(boutique, get_products_by_boutique(boutique_id), public_seller_profiles(boutique_id).get(boutique_id))
+    profile = public_seller_profiles(boutique_id).get(boutique_id)
+    if profile and profile.get("verification_status") != "approved":
+        return None
+    return _catalog_details(boutique, get_products_by_boutique(boutique_id), profile)
 
 
 def get_products_by_boutique(boutique_id):

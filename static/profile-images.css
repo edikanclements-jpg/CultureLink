@@ -1,0 +1,85 @@
+/* Brand artwork stays small; account controls stay in the top right on phones. */
+.site-header { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 24px; }
+.site-header > nav { justify-content: center; margin-left: 0; }
+.brand-home { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand-home img { display: block; width: 60px; height: 60px; object-fit: contain; }
+.header-account { justify-self: end; gap: 14px; }
+.header-account > .account-avatar-link { display: inline-flex; gap: 8px; align-items: center; padding: 2px 0; }
+.profile-picture { display: inline-flex; width: 92px; height: 92px; flex: 0 0 auto; overflow: hidden; border: 1px solid rgba(79,3,1,.25); background: #fff0d7; border-radius: 50%; align-items: center; justify-content: center; vertical-align: middle; }
+.profile-picture img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.picture-fallback { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 26px; letter-spacing: 1px; font-weight: bold; color: var(--burgundy); }
+.picture-fallback svg { fill: none; stroke: currentColor; stroke-width: 1.5; width: 50%; height: 50%; }
+.profile-picture--logo { border-radius: 12px; }
+.profile-picture--logo img { object-fit: contain; padding: 8px; }
+.profile-picture--portrait { border-radius: 12px; width: 112px; height: 136px; }
+.profile-picture--portrait img { object-fit: contain; }
+.account-avatar-link .profile-picture { width: 36px; height: 36px; }
+.account-avatar-link .profile-picture--logo { border-radius: 50%; }
+.account-avatar-link .profile-picture--logo img { padding: 4px; }
+.account-avatar-link .picture-fallback { font-size: 13px; }
+.account-identity { display: flex; gap: 18px; align-items: center; }
+.account-identity > div { min-width: 0; }
+.account-identity h2 { overflow-wrap: anywhere; }
+.photo-field { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 22px; margin: 24px 0 0; padding-top: 22px; border-top: 1px solid rgba(79,3,1,.18); align-items: start; }
+.photo-field .profile-picture--portrait { width: 92px; height: 112px; }
+.photo-field-controls { min-width: 0; }
+.photo-field-controls > label { display: block; font-weight: bold; }
+.photo-optional { font-size: 13px; font-weight: normal; margin-left: 6px; }
+.photo-field .hint { margin: 5px 0 10px; }
+.photo-field input[type=file] { max-width: 100%; min-width: 0; padding: 7px; font-size: 14px; background: #fff0d7; }
+.photo-field input::file-selector-button { padding: 7px 10px; border: 1px solid var(--burgundy); border-radius: 3px; background: var(--burgundy); color: var(--cream); cursor: pointer; margin-right: 8px; font: inherit; }
+.photo-field .photo-remove { display: flex; gap: 8px; align-items: center; font-size: 14px; font-weight: normal; margin-top: 12px; }
+.photo-remove input { width: 18px; min-height: 18px; accent-color: var(--burgundy); flex-shrink: 0; }
+.photo-preview-status:empty { display: none; }
+.seller-identity { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.seller-identity > div { min-width: 0; }
+.seller-identity .profile-picture { width: 96px; height: 96px; }
+.seller-identity .eyebrow { margin-top: 0; }
+.seller-card .seller-logo-link { display: block; min-width: 0; }
+.seller-card .seller-logo-link > .profile-picture { display: flex; width: 100%; height: 180px; border: 0; border-bottom: 1px solid rgba(79,3,1,.14); border-radius: 0; background: #fff; }
+.seller-card .seller-logo-link img { padding: 12px; object-fit: contain; }
+.seller-card--compact { grid-template-columns: 104px minmax(0,1fr); }
+.seller-card--compact .seller-logo-link > .profile-picture { height: 104px; border: 1px solid rgba(79,3,1,.14); border-radius: 7px; }
+.seller-card--compact .seller-logo-link img { padding: 5px; }
+.seller-owner { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); align-items: center; gap: 34px; padding: 30px; margin: 44px auto 0; max-width: 1100px; background: var(--cream); border: 1px solid rgba(79,3,1,.2); border-radius: 12px; }
+.seller-owner-copy { min-width: 0; padding: 12px; }
+.seller-owner-copy .eyebrow { margin: 0 0 12px; }
+.seller-owner h2 { font-size: clamp(38px,4vw,50px); line-height: 1.1; margin: 0 0 18px; }
+.seller-owner h3 { font-size: 25px; font-weight: normal; margin: 0 0 5px; }
+.seller-owner-business { font-size: 22px; margin: 0; overflow-wrap: anywhere; }
+.seller-owner-photo { min-width: 0; margin: 0; background: #f8ecd7; border-radius: 8px; overflow: hidden; }
+.seller-owner-photo img { display: block; width: 100%; height: 360px; object-fit: contain; object-position: center; }
+.seller-owner-photo figcaption { padding: 20px; }
+@media (max-width: 900px) {
+    .site-header { grid-template-columns: auto auto; gap: 12px 24px; }
+    .site-header > nav { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; gap: 24px; }
+    .header-account { grid-column: 2; grid-row: 1; margin: 0; width: auto; border: 0; padding: 0; }
+}
+@media (max-width: 700px) {
+    .seller-owner { grid-template-columns: minmax(0,1fr); gap: 20px; padding: 20px; margin-top: 30px; }
+    .seller-owner-copy { padding: 0; }
+    .seller-owner h2 { font-size: 38px; margin-bottom: 10px; }
+    .seller-owner-copy .eyebrow { font-size: 11px; }
+    .seller-owner-business { font-size: 20px; }
+    .seller-owner-photo img { height: 320px; }
+}
+@media (max-width: 560px) {
+    .site-header { padding: 14px 20px; gap: 10px 12px; }
+    .brand-home img { width: 46px; height: 46px; }
+    .header-account { gap: 10px; font-size: 14px; }
+    .header-account .logout-button { font-size: 14px; padding: 8px 10px; }
+    .account-avatar-link .profile-picture { width: 32px; height: 32px; }
+    .site-header > nav { gap: 10px; font-size: 16px; justify-content: space-between; }
+    .photo-field { grid-template-columns: minmax(0,1fr); gap: 12px; }
+    .photo-field .profile-picture { width: 72px; height: 72px; }
+    .photo-field .profile-picture--portrait { height: 88px; }
+    .account-identity { gap: 12px; }
+    .account-identity > .profile-picture { width: 66px; height: 66px; }
+    .seller-identity { gap: 12px; align-items: flex-start; }
+    .seller-identity .profile-picture { width: 64px; height: 64px; }
+    .seller-identity h1 { font-size: clamp(32px,8vw,44px); }
+    .seller-identity .eyebrow { font-size: 10px; letter-spacing: 1px; }
+    .seller-identity .seller-profile-location { font-size: 18px; }
+    .seller-card--compact { grid-template-columns: 88px minmax(0,1fr); gap: 12px; padding: 14px; }
+    .seller-card--compact .seller-logo-link > .profile-picture { height: 88px; }
+}

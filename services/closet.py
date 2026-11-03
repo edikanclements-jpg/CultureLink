@@ -2,6 +2,7 @@
 
 from database import get_db_connection
 from services.products import PRODUCT_SELECT, format_product
+from services.seller_review_schema import PUBLIC_SELLER_SQL
 
 
 class ClosetAccessError(Exception):
@@ -55,7 +56,7 @@ def set_saved(user_id, product_id, saved):
         user = cursor.fetchone()
         if user is None or user["role"] != "customer":
             raise ClosetAccessError()
-        cursor.execute("SELECT item_id FROM items WHERE item_id = %s", (product_id,))
+        cursor.execute("SELECT i.item_id FROM items i JOIN sellers s ON s.seller_id = i.seller_id WHERE i.item_id = %s AND " + PUBLIC_SELLER_SQL, (product_id,))
         if cursor.fetchone() is None:
             raise ClosetItemNotFound()
         cursor.execute("SELECT saved_item_id FROM saveditems WHERE user_id = %s AND item_id = %s",

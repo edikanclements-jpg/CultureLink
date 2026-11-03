@@ -11,6 +11,7 @@ from services.profile_validation import (
     ADDRESS_FIELDS, BUYER_FIELDS, SELLER_FIELDS, MEASUREMENTS,
     validate_buyer_profile, validate_seller_profile,
 )
+from services.profile_images import prepare_images, save_images
 
 
 onboarding_bp = Blueprint("onboarding", __name__)
@@ -25,6 +26,16 @@ def _unavailable():
 def _forbidden():
     return render_template("auth/message.html", title="Use your account's profile",
                            message="This profile belongs to a different account type. Return to My Account to continue."), 403
+
+
+def _save_pictures(changes, errors):
+    try:
+        save_images(g.user["user_id"], changes)
+        return True
+    except OSError:
+        current_app.logger.warning("Could not save account pictures.")
+        errors["form"] = "Your profile details were saved, but your pictures couldn't be saved. Choose them again and retry."
+        return False
 
 
 @onboarding_bp.route("/onboarding/role", methods=["GET", "POST"])
@@ -74,14 +85,21 @@ def buyer_profile():
         status = 200
         if request.method == "POST":
             values, errors = validate_buyer_profile(request.form)
+            pictures, picture_errors = prepare_images(request.files, request.form, ("avatar",))
+            errors.update(picture_errors)
+            if errors and any(upload.filename for upload in request.files.values()):
+                errors["photo_notice"] = "After correcting the fields, choose your new pictures again before saving."
             if not errors:
                 try:
                     save_buyer_profile(g.user["user_id"], values)
                 except ProfileAccessError:
                     return _forbidden()
-                flash("Your buyer profile has been updated." if profile else "Your buyer profile is ready.", "success")
-                return redirect(url_for("auth.account"))
-            status = 400
+                if _save_pictures(pictures, errors):
+                    flash("Your buyer profile has been updated." if profile else "Your buyer profile is ready.", "success")
+                    return redirect(url_for("auth.account"))
+                status = 503
+            else:
+                status = 400
     except Error:
         return _unavailable()
     return render_template("onboarding/buyer_profile.html", values=values, errors=errors,
@@ -100,15 +118,25 @@ def seller_profile():
         status = 200
         if request.method == "POST":
             values, errors = validate_seller_profile(request.form)
+            pictures, picture_errors = prepare_images(request.files, request.form, ("logo", "portrait"))
+            errors.update(picture_errors)
+            if errors and any(upload.filename for upload in request.files.values()):
+                errors["photo_notice"] = "After correcting the fields, choose your new pictures again before saving."
             if not errors:
                 try:
                     save_seller_profile(g.user["user_id"], values)
                 except ProfileAccessError:
                     return _forbidden()
-                flash("Your seller profile has been updated." if profile else "Your seller profile is ready.", "success")
-                return redirect(url_for("auth.account"))
-            status = 400
+                if _save_pictures(pictures, errors):
+                    return redirect(url_for("onboarding.seller.submitted"))
+                status = 503
+            else:
+                status = 400
     except Error:
         return _unavailable()
     return render_template("onboarding/seller_profile.html", values=values, errors=errors,
                            completed=profile is not None), status
+
+
+from routes.seller_review import seller_bp
+onboarding_bp.register_blueprint(seller_bp)

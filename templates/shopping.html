@@ -23,7 +23,7 @@
         <button type="submit" class="guide-send" data-guide-send>Find my pieces <span aria-hidden="true">&rarr;</span></button>
         <p class="guide-example-label">Or start with a little inspiration</p>
         <div class="guide-examples">
-            {% for text in ['Nigerian wedding pieces', 'Indian pieces under USD 150', 'Show me blue pieces'] %}<button type="submit" name="example" value="{{ text }}" formnovalidate>{{ text }} <span aria-hidden="true">↗</span></button>{% endfor %}
+            {% for text in ['Nigerian wedding pieces', 'Indian pieces under USD 500', 'Show me blue pieces'] %}<button type="submit" name="example" value="{{ text }}" formnovalidate>{{ text }} <span aria-hidden="true">↗</span></button>{% endfor %}
         </div>
     </form>
     <details class="guide-about"><summary>How this guide works</summary><p>Results come from CultureLink's catalog. Search details are shown beside the results so you can check what was understood.</p><p>Budget searches leave out unknown prices and keep currencies separate. Confirm sizing, prices, and availability with the seller.</p><p>{{ 'AI helps interpret your words. Turning it off uses basic catalog search.' if ai_configured else 'Catalog mode recognizes basic search terms. AI language understanding can be connected separately.' }}</p><p>Your last search lasts for this signed-in session. It clears when you log out or choose New search.</p></details>

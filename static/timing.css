@@ -1,0 +1,23 @@
+.demo-timing { margin: 1.4rem 0; padding: 1.1rem 1.2rem; border: 1px solid rgba(79,3,1,.2); border-radius: 10px; background: #fff0d7; }
+.demo-timing-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1rem; }
+.demo-timing-heading h2, .demo-timing-heading h3 { margin: 0; font-size: 1.65rem; line-height: 1.2; }
+.demo-timing-heading > span { padding: .25rem .6rem; border: 1px solid rgba(79,3,1,.25); border-radius: 20px; font-size: .7rem; white-space: nowrap; }
+.demo-timing-route { font-size: .85rem; margin: .7rem 0; overflow-wrap: anywhere; }
+.demo-timing-route > span { padding: 0 .4rem; }
+.demo-timing-values { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; margin: 1rem 0 0; }
+.demo-timing-values > div { padding-top: .6rem; }
+.demo-timing-values dt { font-size: .8rem; }
+.demo-timing-values dd { margin: .3rem 0 0; font-size: 1.6rem; font-weight: 600; line-height: 1.2; }
+.demo-timing-values dd > span { display: block; font-size: .72rem; font-weight: 400; margin-top: .3rem; }
+.demo-timing-note { margin: 1rem 0 0; font-size: .75rem; line-height: 1.6; }
+.info-accordion .demo-timing-note { font-size: .75rem; }
+.info-accordion .demo-timing { margin-bottom: 0; }
+.comparison-timing-note { padding: .8rem 1rem; border-left: 3px solid #aa4c2f; background: #fff0d7; font-size: .85rem; line-height: 1.5; }
+.comparison-table tr[data-timing-row='total'] > td { font-weight: 700; background: rgba(203,168,115,.14); }
+@media (max-width: 440px) {
+    .demo-timing { padding: 1rem; }
+    .demo-timing-values { gap: .6rem; }
+    .demo-timing-values dt { font-size: .72rem; }
+    .demo-timing-values dd { font-size: 1.4rem; }
+    .demo-timing-values dd > span { font-size: .65rem; }
+}

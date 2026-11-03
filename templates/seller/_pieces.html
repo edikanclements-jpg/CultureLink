@@ -1,0 +1,9 @@
+{% macro piece_list(pieces, approved=false, team=false) -%}
+{% if pieces %}<div class="seller-inventory-grid">
+    {% for piece in pieces %}<article class="seller-inventory-card" data-inventory-item="{{ piece.item_id }}">
+        {% if piece.photo_url %}<a class="inventory-photo-link" href="{{ piece.photo_url }}" target="_blank" rel="noopener" aria-label="View full photo of {{ piece.item_name }}"><img src="{{ piece.photo_url }}" alt="{{ piece.item_name }}" loading="lazy"></a>{% endif %}
+        <div class="inventory-copy"><p class="culture-tag">{{ piece.culture_name }} · {{ 'Published' if approved else 'Private draft' }}</p><h3>{{ piece.item_name }}</h3><p>{{ piece.display_price }}</p><dl><div><dt>Size</dt><dd>{{ piece.size }}</dd></div><div><dt>Colors</dt><dd>{{ piece.color }}</dd></div></dl><p class="hint preserve-lines">{{ piece.description }}</p>
+        {% if not team %}<a class="text-link" href="{{ url_for('onboarding.seller.item_edit',item_id=piece.item_id) }}">Edit piece <span aria-hidden="true">→</span></a>{% endif %}</div>
+    </article>{% endfor %}
+</div>{% else %}<div class="empty-state"><h3>{{ 'No pieces submitted yet.' if team else 'Start shaping your collection.' }}</h3><p>{{ 'The business application can be reviewed separately from its future catalog.' if team else 'Add a piece with its photo, sizes, and price. Your drafts stay saved while your application is reviewed.' }}</p></div>{% endif %}
+{%- endmacro %}
