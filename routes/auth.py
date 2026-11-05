@@ -5,13 +5,13 @@ import hmac
 import re
 
 from flask import (
-    Blueprint, abort, current_app, flash, g, redirect, render_template, request,
+    Blueprint, abort, current_app, flash, g, jsonify, redirect, render_template, request,
     send_file, session, url_for,
 )
 from mysql.connector import Error, IntegrityError, errorcode
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from services.accounts import create_account, find_user_by_email, find_user_by_id
+from services.accounts import create_account, find_user_by_email, find_user_by_id, log_database_problem
 from services.account_security import csrf_token
 from services.profiles import completed_profile_kind, get_buyer_profile, get_seller_profile
 from services.profile_images import account_images, image_path, initials
@@ -25,6 +25,7 @@ EMAIL_PATTERN = re.compile(
 )
 MIN_PASSWORD = 12
 MAX_PASSWORD = 128
+PUBLIC_BROWSING = {"main", "products", "boutiques"}
 
 
 def _email_is_valid(email):
@@ -42,6 +43,26 @@ def _message(title, message, status):
     return render_template("auth/message.html", title=title, message=message), status
 
 
+def _database_unavailable(title, message):
+    if request.accept_mimetypes["application/json"] > request.accept_mimetypes["text/html"]:
+        response = jsonify(error=message)
+    else:
+        response = render_template(
+            "auth/message.html", title=title, message=message, database_unavailable=True,
+        )
+    return response, 503, {"Cache-Control": "no-store"}
+
+
+@auth_bp.app_errorhandler(Error)
+def show_database_error(error):
+    log_database_problem(current_app.logger, "page request", error)
+    g.user = None
+    return _database_unavailable(
+        "CultureLink couldn't load this page",
+        "The database is temporarily unavailable. Check the CultureLink database message in Spyder, then try again.",
+    )
+
+
 @auth_bp.app_context_processor
 def account_template_helpers():
     pictures = {}
@@ -56,7 +77,8 @@ def account_template_helpers():
 @auth_bp.before_app_request
 def load_signed_in_user():
     g.user = None
-    if request.endpoint == "static":
+    g.account_lookup_failed = False
+    if request.endpoint in {"static", "auth.logout"}:
         return None
     user_id = session.get("user_id")
     if user_id is None:
@@ -66,12 +88,18 @@ def load_signed_in_user():
         return None
     try:
         g.user = find_user_by_id(user_id)
-    except Error:
-        current_app.logger.warning("Could not load the signed-in CultureLink account.")
-        return _message(
-            "Please try again shortly",
-            "We couldn't reach your account right now. Please refresh the page in a moment.",
-            503,
+    except Error as error:
+        log_database_problem(current_app.logger, "saved login check", error)
+        g.account_lookup_failed = True
+        if request.endpoint in {None, "auth.login", "auth.register"}:
+            return None
+        if request.method in {"GET", "HEAD"} and (
+            request.blueprint in PUBLIC_BROWSING or request.endpoint == "onboarding.seller.item_photo"
+        ):
+            return None
+        return _database_unavailable(
+            "Your account is temporarily unavailable",
+            "Try again to open your account, or go to Home to browse.",
         )
     if g.user is None:
         session.clear()
@@ -104,7 +132,8 @@ def protect_account_forms():
 
 @auth_bp.after_app_request
 def protect_account_responses(response):
-    if (request.endpoint or "").startswith("auth.") or getattr(g, "user", None):
+    if ((request.endpoint or "").startswith("auth.") or getattr(g, "user", None)
+            or getattr(g, "account_lookup_failed", False)):
         response.headers["Cache-Control"] = "no-store"
         response.headers["Pragma"] = "no-cache"
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -169,11 +198,11 @@ def register():
                 if error.errno == errorcode.ER_DUP_ENTRY:
                     errors["email"] = "An account already uses this email. Please log in instead."
                 else:
-                    current_app.logger.warning("Could not create a CultureLink account.")
+                    log_database_problem(current_app.logger, "registration", error)
                     errors["form"] = "We couldn't create your account right now. Please try again."
                     status = 503
-            except Error:
-                current_app.logger.warning("Could not connect to the CultureLink accounts database.")
+            except Error as error:
+                log_database_problem(current_app.logger, "registration", error)
                 errors["form"] = "We couldn't create your account right now. Please try again."
                 status = 503
             else:
@@ -220,8 +249,8 @@ def login():
         else:
             try:
                 user = find_user_by_email(email)
-            except Error:
-                current_app.logger.warning("Could not look up a CultureLink account.")
+            except Error as error:
+                log_database_problem(current_app.logger, "login", error)
                 errors["form"] = "We couldn't log you in right now. Please try again."
                 status = 503
             else:

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from '_components.html' import seller_card with context %}
+{% from '_components.html' import product_image, seller_card with context %}
 {% block title %}CultureLink | Culture, styled your way{% endblock %}
 {% block page_class %}home-page{% endblock %}
 {% block content %}
@@ -49,6 +49,33 @@
             {% endfor %}
         </ol>
     </div>
+</section>
+{% endif %}
+
+{% if previews %}
+<section class="home-section clothing-preview" aria-labelledby="preview-heading" data-clothing-preview>
+    <div class="section-heading">
+        <div><p class="eyebrow">A LITTLE LOOK INSIDE</p><h2 id="preview-heading">Pieces to discover</h2></div>
+        <a class="text-link" href="{{ url_for('products.product_catalog') }}">Browse all pieces <span aria-hidden="true">→</span></a>
+    </div>
+    <p class="preview-copy">Men’s and women’s pieces from across our boutiques. Made-to-measure pieces are priced by quote.
+        {% if show_indian_menswear %}<a class="text-link" href="{{ url_for('products.product_catalog', culture='Indian', keyword='menswear') }}">Explore Indian menswear <span aria-hidden="true">→</span></a>{% endif %}
+    </p>
+    <div class="preview-tools" data-preview-controls hidden>
+        <button type="button" data-preview-prev aria-label="Previous piece">←</button>
+        <span data-preview-position aria-live="polite">1 / {{ previews|length }}</span>
+        <button type="button" data-preview-next aria-label="Next piece">→</button>
+    </div>
+    <ul class="preview-track" data-preview-track aria-label="Clothing previews" tabindex="0">
+        {% for product in previews %}
+        <li>
+            <a class="preview-photo" href="{{ url_for('products.product_details', product_id=product.product_id) }}" aria-label="View {{ product.product_name }}">
+                {{ product_image(product) }}
+            </a>
+            <div class="preview-caption"><h3>{{ product.product_name }}</h3><p>{{ product.boutique_name }}</p></div>
+        </li>
+        {% endfor %}
+    </ul>
 </section>
 {% endif %}
 

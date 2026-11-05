@@ -1,12 +1,34 @@
-"""Seller directory and seller pages with optional public Instagram snapshots."""
+"""Seller directory and public seller profiles."""
+
+import re
+from urllib.parse import urlsplit
 
 from flask import Blueprint, abort, render_template, request, send_file
 from services.boutiques import get_all_boutiques, get_boutique_by_id
 from services.catalog_rules import canonical_location_query, COUNTRY_LOCATION_QUERIES
+from services.indian_menswear import IMAGE_URLS as MENSWEAR_IMAGES
 from services.profile_images import image_path
 from services.profiles import public_seller_profiles
 
 boutiques_bp = Blueprint("boutiques", __name__)
+
+_INSTAGRAM_HANDLE = re.compile(r"[A-Za-z0-9_](?:[A-Za-z0-9_.]{0,28}[A-Za-z0-9_])?")
+_INSTAGRAM_PAGES = {"accounts", "about", "api", "challenge", "direct", "explore",
+                    "p", "reel", "reels", "share", "stories", "tv", "web"}
+
+
+def _instagram_link(boutique):
+    """Link to the supplied profile without affecting its evidence score."""
+    account = boutique["verification"]["account"]
+    if account:
+        return account
+    social = urlsplit(boutique["social_url"])
+    if social.netloc.lower() not in {"instagram.com", "www.instagram.com", "m.instagram.com"}:
+        return None
+    handle = social.path.strip("/")
+    if not _INSTAGRAM_HANDLE.fullmatch(handle) or ".." in handle or handle.casefold() in _INSTAGRAM_PAGES:
+        return None
+    return {"handle": handle, "url": f"https://www.instagram.com/{handle}/"}
 
 
 @boutiques_bp.route("/boutiques")
@@ -34,8 +56,9 @@ def boutique_details(boutique_id):
     boutique = get_boutique_by_id(boutique_id)
     if boutique is None:
         abort(404)
+    products = sorted(boutique["products"], key=lambda piece: piece.get("image_url") not in MENSWEAR_IMAGES)
     return render_template("boutique_details.html", boutique=boutique,
-                           products=boutique["products"])
+                           products=products, instagram=_instagram_link(boutique))
 
 
 @boutiques_bp.route("/boutiques/<int:boutique_id>/images/<kind>")

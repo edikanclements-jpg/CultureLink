@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlsplit
 
 from database import get_db_connection
-from services.catalog_rules import canonical_size, has_custom_size, seller_location, SELLER_LOCATION_SQL
+from services.catalog_rules import canonical_size, has_custom_size, sample_quote_usd, seller_location, SELLER_LOCATION_SQL
 from services.seller_timing import timing_for
 from services.seller_review_schema import PUBLIC_SELLER_SQL
 from services.catalog_expansion import ensure_catalog
@@ -12,6 +12,19 @@ from services.catalog_expansion import ensure_catalog
 
 INR_PATTERN = r"(^|[^A-Z])INR([^A-Z]|$)"
 USD_PATTERN = r"(^|[^A-Z])USD([^A-Z]|$)"
+
+# Local copies of the original photos used in the Home preview. Match the
+# existing source URL so a later seller photo change takes precedence.
+_PREVIEW_PHOTOS = {
+    "https://us.anitadongre.com/dw/image/v2/BGCX_PRD/on/demandware.static/-/Sites-masterCatalog_AD_India/default/"
+    "dw38d06bcc/images/hires/F25/Women/S26RD10_Beige_1.jpg?sh=300&sm=fit&strip=false&sw=200":
+        "/static/catalog/previews/anita-evani.jpg",
+    "https://www.anuattires.com/cdn/shop/files/2_front_Standing_Elegantly_1_1300x.jpg?v=1770235440":
+        "/static/catalog/previews/anu-baby-pink.jpg",
+    "https://theindiacrafthouse.com/cdn/shop/files/The_20Work_20Edit._20Handwoven_20Kashida_20Pattu_20"
+    "Straight_20Dress_20-_20Ivory_20_26_20Blue_20Stripes_20-_20NDK01A_203.jpg?v=1756751296":
+        "/static/catalog/previews/india-craft-ivory.jpg",
+}
 
 PRODUCT_SELECT = f"""
     SELECT
@@ -66,16 +79,19 @@ def currency_for(product):
 
 def format_product(product):
     """Add presentation labels while retaining the original values and IDs."""
+    image_url = product.get("image_url")
+    product["image_url"] = _PREVIEW_PHOTOS.get(image_url, image_url)
     product["size"] = canonical_size(product.get("size"))
     product["custom_size"] = has_custom_size(product["size"])
     product["display_size"] = product["size"] or "Size to be determined"
+    product["sample_quote_usd"] = sample_quote_usd(product)
     product["seller_location"] = seller_location(product.get("boutique_id"), product.get("boutique_name"), product.get("seller_location"))
     product["price_currency"] = "" if product["custom_size"] else currency_for(product)
     if product["custom_size"]:
         # This changes the public projection, not the database's recorded price.
         # Budget searches and seller ranges must also treat this as a quote.
         product["price"] = None
-        product["price_notes"] = "Custom sizing and final pricing will be confirmed together. Price to be determined."
+        product["price_notes"] = "Custom sizing and final pricing will be confirmed together."
     price = product.get("price")
     if price is None or price <= 0:
         product["display_price"] = "Price to be determined"

@@ -22,7 +22,7 @@
         <a class="outfit-piece-photo" href="{{ url_for('products.product_details', product_id=product.product_id) }}" target="_blank" rel="noopener" aria-label="View {{ product.product_name }} details in a new tab">{{ product_image(product) }}</a>
         <input type="checkbox" name="item_ids" value="{{ product.product_id }}" id="outfit-piece-{{ product.product_id }}"{% if product.product_id in selected %} checked{% endif %} aria-describedby="outfit-picker-help" data-piece-name="{{ product.product_name }}">
         <label for="outfit-piece-{{ product.product_id }}" class="outfit-piece-label">
-            <span class="outfit-piece-copy"><span class="outfit-piece-meta"><span class="culture-tag">{{ product.culture }}</span><span class="outfit-check" aria-hidden="true"></span></span><strong>{{ product.product_name }}</strong><span>{{ product.boutique_name }}</span><span class="outfit-piece-price">{{ product.display_price }}</span>{% if product.product_id not in saved_ids %}<span class="outfit-retained">Kept from this outfit</span>{% endif %}</span>
+            <span class="outfit-piece-copy"><span class="outfit-piece-meta"><span class="culture-tag">{{ product.culture }}</span><span class="outfit-check" aria-hidden="true"></span></span><strong>{{ product.product_name }}</strong><span>{{ product.boutique_name }}</span>{% if product.product_id not in saved_ids %}<span class="outfit-retained">Kept from this outfit</span>{% endif %}</span>
         <span class="outfit-choose-label"><span class="outfit-select">Select for outfit</span><span class="outfit-selected">Selected for outfit</span></span>
         </label>
     </div>

@@ -1,0 +1,25 @@
+{% from '_components.html' import product_image %}
+{% macro photo_viewer(product, eager=false, link_to_piece=false) -%}
+<figure class="piece-viewer" data-photo-viewer aria-label="{{ product.product_name }} photo viewer">
+    <div class="piece-photo-stage" data-photo-stage>
+        {% if link_to_piece %}<a class="photo-link" href="{{ url_for('products.product_details', product_id=product.product_id) }}" aria-label="View {{ product.product_name }}">{% endif %}
+        {{ product_image(product, eager=eager) }}
+        {% if link_to_piece %}</a>{% endif %}
+    </div>
+    <figcaption class="piece-viewer-tools" data-photo-controls hidden>
+        <div class="piece-view-modes" role="group" aria-label="Photo slides">
+            <button type="button" data-photo-still aria-pressed="true">1 · Full photo</button>
+            <button type="button" data-photo-detail aria-pressed="false">2 · Drag &amp; zoom</button>
+        </div>
+        <div class="piece-zoom-tools" data-zoom-controls hidden>
+            <div role="group" aria-label="Magnification controls">
+                <button type="button" data-zoom-out aria-label="Zoom out">−</button>
+                <output data-zoom-level aria-label="Magnification">2×</output>
+                <button type="button" data-zoom-in aria-label="Zoom in">+</button>
+                <button type="button" data-zoom-reset>Reset</button>
+            </div>
+            <p>Drag the photo or use the arrow keys to look around.</p>
+        </div>
+    </figcaption>
+</figure>
+{%- endmacro %}

@@ -18,11 +18,11 @@
     <script src="{{ url_for('static', filename='comparison.js', v='closet-timing-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='outfits.css', v='outfits-2') }}">
     <script src="{{ url_for('static', filename='outfits.js', v='outfits-1') }}" defer></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='shopping.css', v='guide-1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='shopping.css', v='assistant-1') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='instagram.css', v='verification-1') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='score-explainer.css', v='score-compact-1') }}">
     <script src="{{ url_for('static', filename='score-explainer.js', v='score-help-1') }}" defer></script>
-    <script src="{{ url_for('static', filename='shopping.js', v='guide-1') }}" defer></script>
+    <script src="{{ url_for('static', filename='shopping.js', v='assistant-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='photo-layout.css', v='compact-photos-1') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='timing.css', v='demo-times-1') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='profile-images.css', v='boutique-owners-1') }}">
@@ -33,6 +33,8 @@
     <script src="{{ url_for('static',filename='commerce.js',v='card-cart-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='culturelink.css', v='welcome-1') }}">
     <script src="{{ url_for('static', filename='culturelink.js', v='welcome-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='gallery.css', v='seller-quick-links-1') }}">
+    <script src="{{ url_for('static', filename='gallery.js', v='preview-1') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -63,7 +65,7 @@
                     {% if g.user and g.user.role == 'customer' %}
                     <p class="menu-label">YOUR SPACE</p>
                     <a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') and endpoint not in ['closet.assistant','closet.assistant_reset'] %} aria-current="page"{% endif %}>Closet</a>
-                    <a href="{{ url_for('closet.assistant') }}"{% if endpoint == 'closet.assistant' %} aria-current="page"{% endif %}>Shopping guide</a>
+                    <a href="{{ url_for('closet.assistant') }}"{% if endpoint == 'closet.assistant' %} aria-current="page"{% endif %}>Assistant</a>
                     <a href="{{ url_for('products.shop.orders') }}"{% if endpoint in ['products.shop.orders','products.shop.order','products.shop.quote'] %} aria-current="page"{% endif %}>Orders &amp; quotes</a>
                     {% elif g.user and g.user.role == 'seller' %}
                     <a href="{{ url_for('onboarding.seller.dashboard') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Seller studio</a>
@@ -71,7 +73,7 @@
                     <a href="{{ url_for('onboarding.seller.review_queue') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Seller reviews</a>
                     {% endif %}
                     <div class="menu-account">
-                        {% if g.user %}
+                        {% if g.user or g.account_lookup_failed %}
                         <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="logout-button">Log out</button>

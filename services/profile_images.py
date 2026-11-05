@@ -30,6 +30,13 @@ CURATED_IMAGE_FILES = {
     7: {"logo": "7-logo.png", "portrait": "7-portrait.png"},
     8: {"logo": "8-logo.png", "portrait": "8-portrait.png"},
 }
+CURATED_OWNER_DETAILS = {
+    2: ("Mrs. Anu", "Owner"),
+    5: ("Sona Puri", "CEO"),
+    6: ("Vickie Jo", "Owner"),
+    7: ("Olaide Ofolis", "Owner"),
+    8: ("Mrs. Priscer", "Owner"),
+}
 
 
 class PhotoValidationError(ValueError):
@@ -93,8 +100,8 @@ def public_seller_images(seller_id, user_id=None, seller_name=""):
             result[kind] = url_for("boutiques.boutique_image", boutique_id=seller_id, kind=kind, v=path.stem)
         elif curated_matches and curated is not None and curated.is_file():
             result[kind] = url_for("static", filename="branding/sellers/" + curated.name, v=curated.stat().st_mtime_ns)
-            if kind == "portrait" and seller_id == 6:
-                result["owner_name"] = "Vickie Jo"  # Name supplied with the photo.
+    if curated_matches and seller_id in CURATED_OWNER_DETAILS:
+        result["owner_name"], result["owner_role"] = CURATED_OWNER_DETAILS[seller_id]
     return result
 
 

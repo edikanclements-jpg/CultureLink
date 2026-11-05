@@ -313,7 +313,7 @@ def preview_quote(user_id,quote_id):
         if quote['status']=='purchased': raise ShoppingConflict('This sample quote has already been used.')
         if quote['status']=='requested':
             # Invented classroom examples, explicitly labeled in the UI.
-            amount=Decimal(150+(quote['product_id']%9)*25)
+            amount = Decimal(product["sample_quote_usd"] or 150 + (quote["product_id"] % 9) * 25)
             cursor.execute("UPDATE buyer_quotes SET status='offered',amount=%s,currency='USD' WHERE quote_id=%s AND user_id=%s",(amount,quote_id,user_id))
         connection.commit()
 

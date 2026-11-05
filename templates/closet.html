@@ -13,6 +13,7 @@
 {% if problem %}
 <div class="closet-empty" role="alert"><h2>Let's try that again.</h2><p>{{ problem }}</p>{% if can_retry %}<a class="button" href="{{ url_for('closet.index') }}">Try again</a>{% else %}<a class="button" href="{{ url_for('products.product_catalog') }}">Explore Discover</a>{% endif %}</div>
 {% else %}
+<p class="collection-quote-note">Open a saved photo for sizing and pricing. Custom pieces are priced by quote.</p>
 <p class="closet-count" data-closet-count aria-live="polite"><strong>{{ products|length }}</strong> saved {{ 'piece' if products|length == 1 else 'pieces' }}</p>
 {% if compare_ids is not none %}
 <section class="compare-panel" aria-label="Compare your pieces" data-compare-panel data-selected="{{ compare_ids|tojson|forceescape }}">

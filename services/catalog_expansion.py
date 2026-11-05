@@ -1,13 +1,10 @@
-"""Add the ten user-supplied Nigerian pieces once, without replacing catalog rows.
-
-Descriptions identify visible clothing details. Original PNG files are kept
-unchanged; no retailer price, fabric, availability or set contents are assumed.
-"""
+"""Add curated pieces once, without replacing existing catalog rows."""
 from threading import Lock
 
 from flask import current_app
 from mysql.connector import Error
 from database import get_db_connection
+from services import indian_menswear
 
 
 SELLERS = {6: 'Klothouse', 7: 'Olis Collections', 8: 'Priscer Luxe'}
@@ -66,7 +63,7 @@ SCHEMA = """CREATE TABLE IF NOT EXISTS curated_catalog_items (
         REFERENCES items (item_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"""
 _import_lock = Lock()
-_READY = 'culturelink_nigerian_catalog_2026_11'
+_READY = 'culturelink_curated_catalog_2026_11'
 
 
 def _ensure_table():
@@ -106,11 +103,27 @@ def ensure_catalog():
         cursor = None
         try:
             cursor = connection.cursor(dictionary=True)
-            # Lock the existing boutique rows in a fixed order. This also
-            # serializes imports from separate Python worker processes.
-            cursor.execute('SELECT seller_id, seller_name FROM sellers WHERE seller_id IN (%s,%s,%s) ORDER BY seller_id FOR UPDATE', tuple(SELLERS))
-            sellers = {row['seller_id']: row['seller_name'] for row in cursor.fetchall()}
-            if any(str(sellers.get(identifier, '')).strip().casefold() != name.casefold() for identifier, name in SELLERS.items()):
+            # Match the selected boutiques by name, then lock the candidate
+            # rows in the same order for each worker.
+            menswear_names = {
+                identifier: {name.casefold(), indian_menswear.SELLER_ALIASES[identifier].casefold()}
+                for identifier, name in indian_menswear.SELLERS.items()
+            }
+            names = sorted(set().union(*menswear_names.values()))
+            placeholders = ','.join(['%s'] * len(names))
+            cursor.execute(
+                'SELECT s.seller_id, s.seller_name, EXISTS ('
+                'SELECT 1 FROM seller_profiles p WHERE p.seller_id = s.seller_id'
+                ') AS account_owned FROM sellers s WHERE s.seller_id IN (%s,%s,%s) '
+                f'OR LOWER(TRIM(s.seller_name)) IN ({placeholders}) ORDER BY s.seller_id FOR UPDATE',
+                (*sorted(SELLERS), *names),
+            )
+            seller_rows = cursor.fetchall()
+            sellers = {
+                row['seller_id']: str(row['seller_name']).strip().casefold()
+                for row in seller_rows
+            }
+            if any(sellers.get(identifier) != name.casefold() for identifier, name in SELLERS.items()):
                 raise Error(msg='The curated boutique records do not match this catalog update. Existing catalog rows were preserved.')
             cursor.execute('SELECT culture_id, culture_name FROM cultures')
             cultures = {row['culture_name'].strip().casefold(): row['culture_id'] for row in cursor.fetchall()}
@@ -118,30 +131,56 @@ def ensure_catalog():
             occasions = {row['occasion_name'].strip().casefold(): row['occasion_id'] for row in cursor.fetchall()}
             if 'nigerian' not in cultures or not {'wedding', 'formal', 'festival'} <= occasions.keys():
                 raise Error(msg='Required culture or occasion records are missing. Existing catalog rows were preserved.')
+            menswear_sellers = {}
+            if 'indian' not in cultures:
+                current_app.logger.warning('Indian menswear needs the Indian culture record in MySQL.')
+            else:
+                # A similarly named seller account is separate from the demo boutique.
+                curated_sellers = {row['seller_id'] for row in seller_rows if not row['account_owned']}
+                for identifier, known_names in menswear_names.items():
+                    matches = [seller_id for seller_id in curated_sellers if sellers[seller_id] in known_names]
+                    if identifier in matches:
+                        menswear_sellers[identifier] = identifier
+                    elif len(matches) == 1:
+                        menswear_sellers[identifier] = matches[0]
+                    else:
+                        current_app.logger.warning(
+                            'Indian menswear could not match a unique seller record for %s.',
+                            indian_menswear.SELLERS[identifier],
+                        )
+            menswear_items = [
+                {**item, 'seller_id': menswear_sellers[item['seller_id']]}
+                for item in indian_menswear.ITEMS if item['seller_id'] in menswear_sellers
+            ]
             cursor.execute('SELECT catalog_key, item_id FROM curated_catalog_items FOR UPDATE')
             existing = {row['catalog_key']: row['item_id'] for row in cursor.fetchall()}
-            for item in ITEMS:
-                if item['key'] in existing:
-                    continue
-                image_url = '/' + ASSET_ROOT + item['asset']
-                # Adopt an exact previously installed asset rather than insert
-                # another copy if its mapping was lost. Never match by row ID.
-                cursor.execute('SELECT item_id, seller_id FROM items WHERE image_url = %s FOR UPDATE', (image_url,))
-                matches = cursor.fetchall()
-                if len(matches) > 1 or (matches and matches[0]['seller_id'] != item['seller_id']):
-                    raise Error(msg='A catalog photo has conflicting item records. Existing rows were preserved.')
-                if matches:
-                    item_id = matches[0]['item_id']
-                else:
-                    cursor.execute('''INSERT INTO items
-                        (seller_id,culture_id,item_name,description,category,price,image_url,purchase_url,price_notes,color,size)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
-                        (item['seller_id'], cultures['nigerian'], item['name'], item['description'],
-                         item['category'], 0, image_url, None, PRICE_NOTES, item['colors'], 'Custom Sizes'))
-                    item_id = cursor.lastrowid
-                    for occasion in item['occasions']:
-                        cursor.execute('INSERT INTO itemoccasions (item_id,occasion_id) VALUES (%s,%s)', (item_id, occasions[occasion.casefold()]))
-                cursor.execute('INSERT INTO curated_catalog_items (catalog_key,item_id) VALUES (%s,%s)', (item['key'], item_id))
+            batches = (
+                ('nigerian', ASSET_ROOT, PRICE_NOTES, ITEMS),
+                ('indian', indian_menswear.ASSET_ROOT, indian_menswear.PRICE_NOTES, menswear_items),
+            )
+            for culture, asset_root, price_notes, items in batches:
+                for item in items:
+                    if item['key'] in existing:
+                        continue
+                    image_url = '/' + asset_root + item['asset']
+                    # Adopt a previously installed asset if its mapping was lost.
+                    cursor.execute('SELECT item_id, seller_id FROM items WHERE image_url = %s FOR UPDATE', (image_url,))
+                    matches = cursor.fetchall()
+                    if len(matches) > 1 or (matches and matches[0]['seller_id'] != item['seller_id']):
+                        raise Error(msg='A catalog photo has conflicting item records. Existing rows were preserved.')
+                    if matches:
+                        item_id = matches[0]['item_id']
+                    else:
+                        cursor.execute('''INSERT INTO items
+                            (seller_id,culture_id,item_name,description,category,price,image_url,purchase_url,price_notes,color,size)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+                            (item['seller_id'], cultures[culture], item['name'], item['description'],
+                             item['category'], item.get('price', 0), image_url, None, price_notes,
+                             item['colors'], item.get('size', 'Custom Sizes')))
+                        item_id = cursor.lastrowid
+                        for occasion in item['occasions']:
+                            cursor.execute('INSERT INTO itemoccasions (item_id,occasion_id) VALUES (%s,%s)', (item_id, occasions[occasion.casefold()]))
+                    cursor.execute('INSERT INTO curated_catalog_items (catalog_key,item_id) VALUES (%s,%s)', (item['key'], item_id))
             connection.commit()
             current_app.extensions[_READY] = True
         except Exception:

@@ -6,6 +6,7 @@ from flask import Blueprint, abort, render_template, request, url_for
 from services.products import get_all_products, get_product_by_id
 from services.search import SORTS, search_products
 from services.catalog_rules import canonical_size, size_labels, STANDARD_SIZES, CUSTOM_SIZE, canonical_location_query
+from services.indian_menswear import IMAGE_URLS as MENSWEAR_IMAGES
 
 
 products_bp = Blueprint("products", __name__)
@@ -104,6 +105,7 @@ def product_catalog():
     return render_template(
         "products.html", products=products, filters=filters,
         options=_filter_options(catalog), errors=errors, sort_labels=SORT_LABELS,
+        show_indian_menswear=any(piece.get("image_url") in MENSWEAR_IMAGES for piece in catalog),
         custom_price_restricted=custom_price_restricted,
         custom_price_url=url_for('products.product_catalog', **custom_filters),
     )

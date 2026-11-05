@@ -6,6 +6,7 @@ from flask import Blueprint, render_template
 
 from services.boutiques import get_all_boutiques
 from services.catalog_rules import LOCATION_OVERRIDES
+from services.indian_menswear import IMAGE_URLS as MENSWEAR_IMAGES
 
 
 main_bp = Blueprint("main", __name__)
@@ -19,6 +20,21 @@ _MAP_LOCATIONS = {
     7: (9.08, 8.68, -6, 10),
     8: (54.50, -2.50, 1, -10),
 }
+
+
+# Curated mix of men's and women's pieces, identified by their local photos.
+_PREVIEW_IMAGES = (
+    "/static/catalog/previews/anita-evani.jpg",
+    "/static/catalog/nigerian/7-ivory-mens.png",
+    "/static/catalog/nigerian/6-pink.png",
+    "/static/catalog/indian-menswear/anita-smyan-blue.jpg",
+    "/static/catalog/previews/anu-baby-pink.jpg",
+    "/static/catalog/indian-menswear/anu-mustard.jpg",
+    "/static/catalog/nigerian/8-purple.png",
+    "/static/catalog/indian-menswear/craft-olive.jpg",
+    "/static/catalog/nigerian/7-peach-bridal.png",
+    "/static/catalog/previews/india-craft-ivory.jpg",
+)
 
 
 def _map_pins(boutiques):
@@ -44,4 +60,16 @@ def _map_pins(boutiques):
 @main_bp.route("/")
 def home():
     boutiques = get_all_boutiques()
-    return render_template("index.html", boutiques=boutiques, map_pins=_map_pins(boutiques))
+    by_image = {}
+    fallback = []
+    for boutique in boutiques:
+        photos = [piece for piece in boutique["products"] if piece.get("image_url")]
+        if photos:
+            by_image.update((piece["image_url"], piece) for piece in photos)
+            fallback.append(photos[-1])
+    previews = [by_image[url] for url in _PREVIEW_IMAGES if url in by_image]
+    featured_sellers = {piece["boutique_id"] for piece in previews}
+    previews.extend(piece for piece in fallback if piece["boutique_id"] not in featured_sellers)
+    return render_template("index.html", boutiques=boutiques,
+                           map_pins=_map_pins(boutiques), previews=previews[:len(_PREVIEW_IMAGES)],
+                           show_indian_menswear=bool(MENSWEAR_IMAGES.intersection(by_image)))

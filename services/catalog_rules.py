@@ -22,6 +22,31 @@ LOCATION_OVERRIDES = {
 }
 
 
+_SAMPLE_QUOTES_USD = {
+    (2, "Light Orange Kurta & Pant Set in Rayon silk"): 165,
+    (2, "Gold Floral Lehenga"): 325,
+    (2, "Lavender Pure Banaras Saree"): 275,
+    (6, "Klothouse Royal Blue Beaded Dress"): 285,
+    (6, "Klothouse Blush Pink Beaded Gown"): 350,
+    (6, "Klothouse Red One-Shoulder Mermaid Gown"): 385,
+    (7, "Olis Collections Rust Embellished Bridal Outfit"): 465,
+    (7, "Olis Collections Peach Beaded Bridal Gown"): 420,
+    (7, "Olis Collections Ivory Embroidered Agbada Set"): 270,
+    (8, "Priscer Luxe Lime Green Printed Dress"): 165,
+    (8, "Priscer Luxe Orange Puff-Sleeve Printed Gown"): 225,
+    (8, "Priscer Luxe Purple Floral Midi Dress"): 195,
+}
+
+
+def sample_quote_usd(product):
+    """Return an invented demo offer for a selected made-to-measure piece."""
+    seller_id = product.get("boutique_id")
+    seller = LOCATION_OVERRIDES.get(seller_id)
+    if product.get("custom_size") and seller and product.get("boutique_name") == seller[0]:
+        return _SAMPLE_QUOTES_USD.get((seller_id, product.get("product_name")))
+    return None
+
+
 def _sql_literal(value):
     return "'" + value.replace("'", "''") + "'"
 

@@ -1,45 +1,126 @@
 {% extends 'base.html' %}
 {% from '_components.html' import product_card with context %}
-{% from '_seller_timing.html' import timing_panel %}
 {% from '_profile_images.html' import profile_picture %}
 {% block title %}{{ boutique.boutique_name }} | CultureLink{% endblock %}
+{% block page_class %}boutique-page{% endblock %}
 {% block content %}
-<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('boutiques.boutique_directory') }}">Sellers</a><span aria-hidden="true">/</span><span>{{ boutique.boutique_name }}</span></nav>
+{% set portrait = boutique.pictures.get('portrait') %}
+{% set owner_name = boutique.pictures.get('owner_name') %}
+{% set owner_role = boutique.pictures.get('owner_role', 'Owner') %}
+{% set has_owner = portrait or owner_name or instagram %}
+{% set timing = boutique.timing %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{{ url_for('boutiques.boutique_directory') }}">Sellers</a>
+    <span aria-hidden="true">/</span><span>{{ boutique.boutique_name }}</span>
+</nav>
 <section class="seller-profile" data-boutique-id="{{ boutique.boutique_id }}" aria-labelledby="seller-heading">
-    <div class="seller-profile-header">
-        <div class="seller-identity">{{ profile_picture(boutique.pictures.get('logo'), boutique.boutique_name ~ ' logo', 'logo', boutique.initials) }}<div><p class="eyebrow">{{ boutique.cultures|join(' · ') or 'CULTURELINK BOUTIQUE' }}</p><h1 id="seller-heading">{{ boutique.boutique_name }}</h1><p class="seller-profile-location">{{ boutique.location or 'Location not provided' }}</p></div></div>
-        <div class="seller-profile-actions">
-            <a class="button secondary-button" href="#collection-heading">Shop this collection <span aria-hidden="true">↓</span></a>
+    <div class="seller-identity">
+        {{ profile_picture(boutique.pictures.get('logo'), boutique.boutique_name ~ ' logo', 'logo', boutique.initials) }}
+        <div>
+            <p class="eyebrow">SELLER PROFILE</p>
+            <h1 id="seller-heading">{{ boutique.boutique_name }}</h1>
+            <p class="seller-profile-location">{{ boutique.location or 'Location not provided' }}</p>
         </div>
     </div>
-    {% if boutique.description %}<p class="seller-description">{{ boutique.description }}</p>{% endif %}
-    {% if boutique.verification_status == 'approved' %}<p class="application-public-label" title="CultureLink's team approved this business application. This is separate from its public Evidence score.">Seller application approved</p>{% endif %}
-    <dl class="seller-facts">
-        <div><dt>Cultures represented</dt><dd>{{ boutique.cultures|join(', ') or 'Not provided' }}</dd></div>
-        <div><dt>Occasions</dt><dd>{{ boutique.occasions|join(', ') or 'Not provided' }}</dd></div>
-        <div><dt>Clothing types</dt><dd>{{ boutique.clothing_types|join(', ') or 'Not provided' }}</dd></div>
-        <div><dt>Price guide</dt><dd>{{ boutique.price_ranges|join(' · ') or boutique.price_info or 'Price to be determined' }}</dd></div>
-    </dl>
-    {{ timing_panel(boutique.timing) }}
-    <details class="info-accordion seller-delivery"><summary>Production, shipping &amp; alterations</summary>{% if boutique.lead_time or boutique.shipping_regions %}{% if boutique.lead_time %}<p><strong>Seller-provided lead time:</strong> {{ boutique.lead_time }}</p>{% endif %}{% if boutique.shipping_regions %}<p><strong>Delivery areas:</strong> {{ boutique.shipping_regions }}</p>{% endif %}<p>Confirm timing and any alterations directly with the seller.</p>{% else %}<p>Confirmed production, shipping and alteration terms have not been supplied. The sample timing above is for the prototype; confirm actual timing before ordering.</p>{% endif %}</details>
 </section>
-{% include '_instagram_evidence.html' %}
+<nav class="seller-quick-links" aria-label="On this seller profile">
+    <a href="#collection-heading">Collection</a>
+    <a href="#order-timing">Timing</a>
+    <a href="#seller-verification">Verification</a>
+    {% if has_owner %}<a href="#seller-owner">{{ owner_role if portrait or owner_name else 'Instagram' }}</a>{% endif %}
+</nav>
+
 <section class="seller-collection" aria-labelledby="collection-heading">
-    <div class="section-heading"><h2 id="collection-heading">From this seller</h2><p class="result-count" role="status">{{ products|length }} {{ 'piece' if products|length == 1 else 'pieces' }}</p></div>
-    {% if products %}<div class="product-grid seller-products">{% for product in products %}{{ product_card(product, heading='h3') }}{% endfor %}</div>{% else %}<div class="empty-state"><h3>No pieces listed yet</h3><p>Explore the rest of the catalog while this seller's collection is being added.</p><a class="button" href="{{ url_for('products.product_catalog') }}">Discover pieces</a></div>{% endif %}
-</section>
-{% if boutique.pictures.get('portrait') %}
-<section class="seller-owner" data-owner-section aria-labelledby="owner-heading">
-    <div class="seller-owner-copy">
-        <p class="eyebrow">BEHIND THE BOUTIQUE</p>
-        <h2 id="owner-heading">Meet the owner!</h2>
-        {% if boutique.pictures.get('owner_name') %}<h3>{{ boutique.pictures.owner_name }}</h3>{% endif %}
-        <p class="seller-owner-business">{{ boutique.boutique_name }}</p>
+    <div class="section-heading">
+        <h2 id="collection-heading">Shop the collection</h2>
+        <p class="result-count" role="status">{{ products|length }} {{ 'piece' if products|length == 1 else 'pieces' }}</p>
     </div>
+    {% if products %}
+    <p class="collection-quote-note">Open a photo for sizing and pricing. Made-to-measure pieces are priced by quote.</p>
+    <div class="product-grid seller-products">
+        {% for product in products %}{{ product_card(product, heading='h3', show_seller=false) }}{% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state"><h3>No pieces listed yet</h3><p>Explore the rest of the catalog while this seller's collection is being added.</p><a class="button" href="{{ url_for('products.product_catalog') }}">Discover pieces</a></div>
+    {% endif %}
+</section>
+
+<section class="boutique-about" id="about-boutique" aria-label="Boutique details">
+    <dl class="seller-facts">
+        {% for label, values in [
+            ('Cultures represented', boutique.cultures),
+            ('Occasions', boutique.occasions),
+            ('Clothing types', boutique.clothing_types)
+        ] %}
+        <div>
+            <dt>{{ label }}</dt>
+            <dd>{% for value in values %}<span class="seller-fact-chip">{{ value }}</span>{% else %}<span>Not provided</span>{% endfor %}</dd>
+        </div>
+        {% endfor %}
+    </dl>
+    <details class="seller-about-details">
+        <summary>About this boutique</summary>
+        {% if boutique.description %}<p class="seller-description">{{ boutique.description }}</p>{% endif %}
+        <p><strong>Price guide</strong> · {{ boutique.price_ranges|join(' · ') or boutique.price_info or 'Request a quote for custom pieces' }}</p>
+        {% if boutique.verification_status == 'approved' %}
+        <p class="application-public-label" title="CultureLink's team approved this business application. This is separate from its public Evidence score.">Seller application approved</p>
+        {% endif %}
+    </details>
+</section>
+
+<div class="seller-profile-details">
+    <section class="seller-order-card" id="order-timing" aria-labelledby="order-timing-heading"{% if timing %} data-demo-timing data-demo-total="{{ timing.total_days }}"{% endif %}>
+        <h2 id="order-timing-heading">Order timing</h2>
+        {% if timing %}
+        <p class="seller-profile-summary">Sample U.S. estimate in business days</p>
+        <dl class="seller-order-values">
+            {% for label, days in [('To make', timing.production_days), ('To ship', timing.shipping_days), ('Total', timing.total_days)] %}
+            <div><dt>{{ label }}</dt><dd>{{ days }}</dd></div>
+            {% endfor %}
+        </dl>
+        {% elif boutique.lead_time %}
+        <p class="seller-profile-summary">Seller-provided lead time</p>
+        <p class="seller-lead-time">{{ boutique.lead_time }}</p>
+        {% else %}
+        <p class="seller-profile-summary">Ask the seller for production and shipping times.</p>
+        {% endif %}
+        {% if timing or boutique.lead_time or boutique.shipping_regions %}
+        <details class="info-accordion seller-delivery">
+            <summary>Delivery &amp; alterations</summary>
+            {% if timing %}
+            <p>The prototype uses a Monday to Friday schedule after order details are confirmed. Confirm measurements and final pricing for custom pieces.</p>
+            {% if boutique.lead_time %}<p><strong>Seller-provided lead time</strong> · {{ boutique.lead_time }}</p>{% endif %}
+            {% endif %}
+            {% if boutique.shipping_regions %}<p><strong>Delivery areas</strong> · {{ boutique.shipping_regions }}</p>{% endif %}
+            <p>Confirm timing, shipping and alterations with the seller before ordering.</p>
+        </details>
+        {% endif %}
+    </section>
+    {% include '_instagram_evidence.html' %}
+</div>
+
+{% if has_owner %}
+<section class="seller-owner{% if portrait %} seller-owner--with-photo{% endif %}" id="seller-owner" data-owner-section aria-labelledby="owner-heading">
+    {% if portrait %}
     <figure class="seller-owner-photo">
-        <img src="{{ boutique.pictures.portrait }}" alt="Owner of {{ boutique.boutique_name }}" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
+        <img src="{{ portrait }}" alt="{{ owner_name or ('Owner of ' ~ boutique.boutique_name) }}" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
         <figcaption class="hint" hidden>Owner photo unavailable.</figcaption>
     </figure>
+    {% endif %}
+    <div class="seller-owner-copy">
+        <p class="eyebrow">{% if owner_name %}MEET THE {{ owner_role|upper }}{% else %}BEHIND THE BOUTIQUE{% endif %}</p>
+        <h2 id="owner-heading">{{ owner_name or ('Meet the owner' if portrait else 'Find us on Instagram') }}</h2>
+        <p class="seller-owner-business">{{ owner_role ~ ' of ' if owner_name else '' }}{{ boutique.boutique_name }}</p>
+        {% if instagram %}
+        <a class="seller-instagram-link" href="{{ instagram.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ boutique.boutique_name }} on Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/>
+                <circle cx="17.4" cy="6.7" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+            <span>@{{ instagram.handle }}</span>
+        </a>
+        {% endif %}
+    </div>
 </section>
 {% endif %}
 {% endblock %}

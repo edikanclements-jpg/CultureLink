@@ -1,101 +1,111 @@
 {% extends 'base.html' %}
 {% from '_components.html' import product_card with context %}
+
+{% macro filter_select(key, label, any_label, quiet_label=false) -%}
+<label for="{{ key }}"{% if quiet_label %} class="setup-announcement"{% endif %}>{{ label }}</label>
+<select id="{{ key }}" name="{{ key }}"{% if key == 'size' %} aria-describedby="size-help"{% endif %}>
+    <option value="">{{ any_label }}</option>
+    {% for value, text in options[key] %}
+    <option value="{{ value }}"{% if filters[key] == value %} selected{% endif %}>{{ text }}</option>
+    {% endfor %}
+</select>
+{%- endmacro %}
+
 {% block title %}Discover | CultureLink{% endblock %}
+{% block page_class %}discover-page{% endblock %}
 {% block content %}
+<header class="intro discover-intro">
+    <p class="eyebrow">BROWSE THE CATALOG</p>
+    <h1>Discover</h1>
+    <p>Find a piece for your next occasion.</p>
+    {% if show_indian_menswear %}<p><a class="text-link" href="{{ url_for('products.product_catalog', culture='Indian', keyword='menswear') }}">Explore Indian menswear <span aria-hidden="true">→</span></a></p>{% endif %}
+</header>
 
-        <div class="intro">
-            <p class="eyebrow">FIND SOMETHING SPECIAL</p>
-            <h1>Discover</h1>
-            <p>Find cultural clothing for your next occasion.</p>
+{% if errors %}
+<div class="validation discover-validation" role="alert">
+    <p><strong>Please check your filters.</strong></p>
+    <ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form id="catalog-filters" class="discover-controls" method="get" action="{{ url_for('products.product_catalog') }}" role="search" aria-label="Find clothing">
+    <div class="discover-toolbar">
+        <div class="discover-search">
+            <label class="setup-announcement" for="keyword">Search outfits or sellers</label>
+            <input id="keyword" name="keyword" type="search" value="{{ filters.keyword }}" placeholder="Search outfits or sellers">
         </div>
+        <div class="discover-occasion">{{ filter_select('occasion', 'Occasion', 'Any occasion', quiet_label=true) }}</div>
+        <button type="submit">Search</button>
+    </div>
+    <p class="collection-quote-note">Made-to-measure pieces are priced by quote.</p>
 
-        <label class="search-label" for="keyword">Search outfits or sellers</label>
-        <div class="search-row">
-            <input id="keyword" name="keyword" type="search" form="catalog-filters"
-                   value="{{ filters.keyword }}" placeholder="Try a piece, culture, or boutique name">
-            <button type="submit" form="catalog-filters">Search</button>
-        </div>
-
-        {% if errors %}
-        <div class="validation" role="alert">
-            <p><strong>Please check your filters.</strong></p>
-            <ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
-        </div>
-        {% endif %}
-
-        <div class="catalog-layout">
-            <aside>
-                <details class="filter-panel" open>
-                    <summary>Filters</summary>
-                    <form id="catalog-filters" method="get" action="{{ url_for('products.product_catalog') }}">
-                        {% for key, label, any_label in [
-                            ('culture', 'Culture', 'Any culture'),
-                            ('occasion', 'Occasion', 'Any occasion'),
-                            ('color', 'Color', 'Any color'),
-                            ('size', 'Size', 'Any listed size'),
-                            ('location', 'Seller location', 'Any location'),
-                            ('currency', 'Currency', 'Any currency')
-                        ] %}
-                        <div class="field">
-                            <label for="{{ key }}">{{ label }}</label>
-                            <select id="{{ key }}" name="{{ key }}"{% if key == 'size' %} aria-describedby="size-help"{% endif %}>
-                                <option value="">{{ any_label }}</option>
-                                {% for value, text in options[key] %}
-                                <option value="{{ value }}"{% if filters[key] == value %} selected{% endif %}>{{ text }}</option>
-                                {% endfor %}
-                            </select>
-                            {% if key == 'size' %}<p class="hint" id="size-help">Custom Sizes: final measurements and price are confirmed together.</p>{% endif %}
-                        </div>
+    {% set extra_filters = [filters.culture, filters.color, filters.size, filters.location, filters.currency, filters.min_price, filters.max_price]|select|list|length %}
+    {% set extra_filters = extra_filters + (1 if filters.sort != 'name_asc' else 0) %}
+    <details class="discover-filters"{% if errors %} open{% endif %}>
+        <summary>
+            Filters &amp; sort
+            {% if extra_filters %}<span class="discover-filter-count" aria-label="{{ extra_filters }} active">{{ extra_filters }}</span>{% endif %}
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m5 8 5 5 5-5"/></svg>
+        </summary>
+        <div class="discover-filter-panel">
+            <div class="discover-filter-fields">
+                {% for key, label, any_label in [
+                    ('culture', 'Culture', 'Any culture'),
+                    ('color', 'Color', 'Any color'),
+                    ('size', 'Size', 'Any listed size'),
+                    ('location', 'Seller location', 'Any location'),
+                    ('currency', 'Currency', 'Any currency')
+                ] %}
+                <div class="field">
+                    {{ filter_select(key, label, any_label) }}
+                    {% if key == 'size' %}<p class="hint" id="size-help">Custom sizing and price are confirmed together.</p>{% endif %}
+                </div>
+                {% endfor %}
+                <div class="field">
+                    <label for="sort">Sort</label>
+                    <select id="sort" name="sort" aria-describedby="price-help">
+                        {% for value, text in sort_labels %}
+                        <option value="{{ value }}"{% if filters.sort == value %} selected{% endif %}>{{ text }}</option>
                         {% endfor %}
-
-                        <fieldset class="price-range">
-                            <legend>Price range</legend>
-                            <p class="hint" id="price-help">Choose a currency for fixed-price filters. Custom-size and other unpriced pieces are excluded.</p>
-                            <div class="price-fields">
-                                <div class="field">
-                                    <label for="min_price">Minimum</label>
-                                    <input id="min_price" name="min_price" type="number" min="0" step="0.01"
-                                           value="{{ filters.min_price }}" aria-describedby="price-help">
-                                </div>
-                                <div class="field">
-                                    <label for="max_price">Maximum</label>
-                                    <input id="max_price" name="max_price" type="number" min="0" step="0.01"
-                                           value="{{ filters.max_price }}" aria-describedby="price-help">
-                                </div>
-                            </div>
-                        </fieldset>
-                        <button class="apply-button" type="submit">Apply filters</button>
-                        <a class="clear-link" href="{{ url_for('products.product_catalog') }}">Clear filters</a>
-                    </form>
-                </details>
-            </aside>
-
-            <section id="results" aria-label="Search results">
-                <div class="results-toolbar">
-                    <p class="result-count" role="status"><strong>{{ products|length }}</strong> {{ 'piece' if products|length == 1 else 'pieces' }}</p>
-                    <div class="sort-controls">
-                        <label for="sort">Sort</label>
-                        <select id="sort" name="sort" form="catalog-filters">
-                            {% for value, text in sort_labels %}
-                            <option value="{{ value }}"{% if filters.sort == value %} selected{% endif %}>{{ text }}</option>
-                            {% endfor %}
-                        </select>
-                        <button class="secondary-button" type="submit" form="catalog-filters">Update</button>
+                    </select>
+                </div>
+            </div>
+            <fieldset class="price-range">
+                <legend>Price range</legend>
+                <p class="hint" id="price-help">Choose a currency to filter or sort by listed price.</p>
+                <div class="price-fields">
+                    <div class="field">
+                        <label for="min_price">Minimum</label>
+                        <input id="min_price" name="min_price" type="number" min="0" step="0.01"
+                               value="{{ filters.min_price }}" aria-describedby="price-help">
+                    </div>
+                    <div class="field">
+                        <label for="max_price">Maximum</label>
+                        <input id="max_price" name="max_price" type="number" min="0" step="0.01"
+                               value="{{ filters.max_price }}" aria-describedby="price-help">
                     </div>
                 </div>
-
-                {% if products %}
-                <div class="product-grid">
-                    {% for product in products %}{{ product_card(product) }}{% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <h2>{{ 'Check your filters' if errors else 'Custom pricing works differently' if custom_price_restricted else 'No pieces found' }}</h2>
-                    <p>{{ 'Correct the filter information above and try again.' if errors else 'Custom-size pieces do not have fixed prices. Clear the currency and price limits to see them.' if custom_price_restricted else 'Try another search or clear your filters to explore all pieces.' }}</p>
-                    <a class="button" href="{{ custom_price_url if custom_price_restricted and not errors else url_for('products.product_catalog') }}">{{ 'Show custom-size pieces' if custom_price_restricted and not errors else 'Clear filters' }}</a>
-                </div>
-                {% endif %}
-            </section>
+            </fieldset>
+            <div class="discover-filter-actions">
+                <button type="submit">Apply filters</button>
+                <a class="text-link" href="{{ url_for('products.product_catalog') }}">Clear filters</a>
+            </div>
         </div>
-    
+    </details>
+</form>
+
+<section id="results" class="discover-results" aria-label="Search results">
+    {% if products %}
+    <p class="result-count" role="status"><strong>{{ products|length }}</strong> {{ 'piece' if products|length == 1 else 'pieces' }}</p>
+    <div class="product-grid discover-grid">
+        {% for product in products %}{{ product_card(product) }}{% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h2>{{ 'Check your filters' if errors else 'Custom pricing works differently' if custom_price_restricted else 'No pieces found' }}</h2>
+        <p>{{ 'Correct the filter information above and try again.' if errors else 'Custom-size pieces do not have fixed prices. Clear the currency and price limits to see them.' if custom_price_restricted else 'Try another search or clear your filters to explore all pieces.' }}</p>
+        <a class="button" href="{{ custom_price_url if custom_price_restricted and not errors else url_for('products.product_catalog') }}">{{ 'Show custom-size pieces' if custom_price_restricted and not errors else 'Clear filters' }}</a>
+    </div>
+    {% endif %}
+</section>
 {% endblock %}
