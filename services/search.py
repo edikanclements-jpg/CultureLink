@@ -4,6 +4,7 @@ from database import get_db_connection
 from services.products import INR_PATTERN, USD_PATTERN, format_product
 from services.catalog_rules import SELLER_LOCATION_SQL, matches_size, canonical_location_query, COUNTRY_LOCATION_QUERIES
 from services.seller_review_schema import PUBLIC_SELLER_SQL
+from services.catalog_expansion import ensure_catalog
 
 
 SORTS = {
@@ -19,6 +20,7 @@ def search_products(keyword=None, culture=None, occasion=None, size=None,
                     color=None, min_price=None, max_price=None,
                     location=None, currency=None, sort="name_asc"):
     """Filter the existing tables; user-entered values remain SQL parameters."""
+    ensure_catalog()
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     try:

@@ -20,7 +20,7 @@
             form.action = result.saved ? form.dataset.removeUrl : form.dataset.saveUrl;
             button.classList.toggle('is-saved', result.saved);
             if (!removeMode) button.setAttribute('aria-pressed', String(result.saved));
-            form.querySelector('[data-closet-label]').textContent = removeMode ? 'Remove' : result.saved ? 'Saved' : 'Save';
+            form.querySelector('[data-closet-label]').textContent = removeMode || result.saved ? 'Saved' : 'Save';
         });
         document.querySelectorAll('[data-closet-count]').forEach(counter => {
             const number = document.createElement('strong');

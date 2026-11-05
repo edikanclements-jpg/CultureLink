@@ -1,0 +1,422 @@
+.commerce-shell {
+    max-width:1160px;
+    margin:0 auto}
+.commerce-topline,.commerce-nav,.cart-line-bottom {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap}
+.commerce-topline {
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(79,3,1,.2)}
+.commerce-demo {
+    display:inline-block;
+    border:1px solid rgba(79,3,1,.35);
+    border-radius:30px;
+    padding:5px 11px;
+    font-size:11px;
+    letter-spacing:1.1px}
+.commerce-nav {
+    justify-content:flex-start;
+    font-size:16px}
+.commerce-nav a {
+    padding:5px 0}
+.commerce-nav a[aria-current] {
+    border-bottom:2px solid var(--burgundy)}
+.commerce-heading {
+    margin:35px 0;
+    max-width:760px}
+.commerce-heading h1 {
+    font-size:clamp(44px,6vw,70px);
+    line-height:1.02;
+    overflow-wrap:anywhere}
+.commerce-heading>p {
+    margin:10px 0}
+.commerce-layout {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 350px;
+    gap:28px;
+    align-items:start}
+.commerce-layout>*,.cart-piece-copy {
+    min-width:0}
+.commerce-panel,.commerce-summary,.cart-line,.commerce-empty {
+    background:var(--cream);
+    border:1px solid rgba(79,3,1,.2);
+    border-radius:12px;
+    padding:28px}
+.commerce-panel h2,.commerce-summary h2,.commerce-empty h2 {
+    font-size:33px;
+    line-height:1.12;
+    margin:8px 0 20px;
+    overflow-wrap:anywhere}
+.commerce-panel h3,.commerce-summary h3 {
+    font-size:23px;
+    line-height:1.2;
+    margin:20px 0 10px;
+    overflow-wrap:anywhere}
+.commerce-panel>p,.commerce-summary>p {
+    margin:12px 0}
+.commerce-summary {
+    position:sticky;
+    top:24px}
+.commerce-wide-button {
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-top:22px;
+    text-align:left;
+    min-height:48px}
+.commerce-summary>.text-link {
+    margin-top:18px}
+.commerce-total {
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    padding:16px 0;
+    border-top:1px solid rgba(79,3,1,.22)}
+.commerce-total strong {
+    white-space:nowrap}
+.commerce-simulation-note {
+    font-size:15px;
+    padding:14px 0;
+    border-top:1px solid rgba(79,3,1,.2);
+    line-height:1.5}
+.commerce-error {
+    padding:14px 16px;
+    border:1px solid var(--terracotta);
+    border-left:4px solid var(--terracotta);
+    border-radius:5px;
+    font-size:16px;
+    overflow-wrap:anywhere;
+    background:var(--cream)}
+.cart-lines {
+    display:grid;
+    gap:20px}
+.cart-line {
+    display:grid;
+    grid-template-columns:125px minmax(0,1fr);
+    gap:23px;
+    padding:23px}
+.cart-piece-photo {
+    min-width:0}
+.cart-piece-photo .photo-frame {
+    width:100%;
+    height:160px;
+    aspect-ratio:auto;
+    background:#f8ecd7;
+    border-radius:6px;
+    overflow:hidden}
+.cart-piece-photo .photo-frame img {
+    object-fit:contain}
+.cart-piece-photo .image-placeholder {
+    font-size:13px}
+.cart-piece-copy h2 {
+    font-size:27px;
+    line-height:1.12;
+    margin:5px 0 14px;
+    overflow-wrap:anywhere}
+.cart-piece-copy h2 a {
+    text-decoration:none}
+.cart-piece-copy>p {
+    margin:9px 0}
+.cart-piece-copy .eyebrow {
+    font-size:11px}
+.cart-update-form {
+    display:grid;
+    grid-template-columns:minmax(70px,1fr) 86px auto;
+    gap:10px;
+    align-items:end;
+    margin:17px 0}
+.cart-update-form label,.commerce-fields label,.purchase-fields label {
+    display:block;
+    font-size:15px;
+    margin-bottom:6px}
+.cart-update-form button {
+    padding:9px 11px;
+    min-height:44px;
+    font-size:15px}
+.cart-line-bottom {
+    border-top:1px solid rgba(79,3,1,.18);
+    padding-top:14px;
+    margin-top:17px}
+.commerce-text-button {
+    border:0;
+    padding:6px 0;
+    background:transparent;
+    color:var(--burgundy);
+    text-decoration:underline;
+    font-size:15px;
+    min-height:36px}
+.commerce-text-button:hover {
+    background:transparent;
+    color:var(--burgundy)}
+.commerce-empty {
+    text-align:center;
+    padding:55px 26px;
+    max-width:800px;
+    margin:20px auto}
+.commerce-empty>span {
+    font-size:38px}
+.commerce-empty p {
+    max-width:470px;
+    margin:16px auto 24px}
+.commerce-fields {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px 16px;
+    margin:24px 0}
+.commerce-fields>div {
+    min-width:0}
+.commerce-field-wide {
+    grid-column:1/-1}
+.commerce-fields textarea {
+    display:block;
+    width:100%;
+    padding:12px;
+    border:1px solid rgba(79,3,1,.45);
+    border-radius:4px;
+    background:#fff0d7;
+    color:var(--burgundy);
+    font:inherit;
+    resize:vertical}
+.demo-payment {
+    border-top:1px solid rgba(79,3,1,.2);
+    padding-top:23px;
+    margin-top:30px}
+.commerce-check {
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    font-size:16px;
+    margin-top:25px}
+.commerce-check input {
+    width:19px;
+    min-width:19px;
+    min-height:19px;
+    margin:4px 0 0;
+    accent-color:var(--burgundy)}
+.checkout-piece {
+    border-top:1px solid rgba(79,3,1,.18);
+    padding:16px 0;
+    font-size:16px;
+    overflow-wrap:anywhere}
+.checkout-piece>p {
+    margin:6px 0}
+.commerce-confirmation {
+    max-width:700px;
+    margin:40px auto;
+    text-align:center}
+.commerce-confirmation-mark {
+    width:57px;
+    height:57px;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--burgundy);
+    border-radius:50%;
+    font-size:28px}
+.commerce-confirmation h1 {
+    font-size:clamp(48px,6vw,72px);
+    line-height:1}
+.confirmation-subtitle {
+    font-size:24px}
+.commerce-summary address {
+    font-style:normal;
+    line-height:1.6;
+    overflow-wrap:anywhere}
+.receipt-piece {
+    display:grid;
+    grid-template-columns:110px minmax(0,1fr);
+    gap:20px;
+    padding:20px 0;
+    border-top:1px solid rgba(79,3,1,.2)}
+.receipt-piece h3 {
+    margin:5px 0 14px}
+.receipt-piece p {
+    margin:8px 0;
+    overflow-wrap:anywhere}
+.receipt-piece .eyebrow {
+    font-size:11px}
+.commerce-history-row {
+    display:flex;
+    gap:20px;
+    justify-content:space-between;
+    align-items:center;
+    border-top:1px solid rgba(79,3,1,.2);
+    padding:20px 0}
+.commerce-history-row>div {
+    min-width:0}
+.commerce-history-row>a {
+    flex-shrink:0}
+.commerce-history-row h3 {
+    margin:5px 0}
+.commerce-history-row p {
+    margin:7px 0;
+    overflow-wrap:anywhere}
+.commerce-panel+.commerce-panel {
+    margin-top:28px}
+.quote-product-photo .photo-frame {
+    height:260px;
+    aspect-ratio:auto;
+    margin-bottom:24px;
+    background:#f8ecd7;
+    border-radius:6px;
+    overflow:hidden}
+.quote-product-photo img {
+    object-fit:contain}
+.quote-price {
+    font-size:34px;
+    font-weight:bold}
+.quote-measurements {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px 24px}
+.commerce-message {
+    max-width:750px;
+    margin:35px auto}
+.commerce-message h1 {
+    font-size:48px;
+    line-height:1.05}
+.purchase-panel {
+    border-top:1px solid rgba(79,3,1,.25);
+    border-bottom:1px solid rgba(79,3,1,.25);
+    padding:22px 0;
+    margin:22px 0}
+.purchase-panel h2 {
+    font-size:29px;
+    margin:10px 0}
+.purchase-fields {
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:15px 0}
+.purchase-fields>div {
+    flex:1 1 120px;
+    max-width:180px}
+.purchase-fields button {
+    min-height:45px}
+.cart-icon-link {
+    position:relative;
+    flex:0 0 37px;
+    width:37px;
+    height:39px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:var(--burgundy)}
+.cart-icon-link svg {
+    width:25px;
+    height:25px}
+.cart-count-badge {
+    position:absolute;
+    right:-4px;
+    top:-3px;
+    min-width:19px;
+    height:19px;
+    padding:0 4px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--burgundy);
+    color:var(--cream);
+    font-size:11px;
+    font-weight:bold;
+    line-height:1}
+.cart-just-updated .cart-count-badge {
+    animation:cart-count-arrival .25s ease-out}
+.cart-feedback a {
+    color:inherit;
+    font-weight:bold}
+.commerce-fx {
+    border-top:1px solid rgba(79,3,1,.2);
+    font-size:14px;
+    padding:13px 0;
+    margin:10px 0}
+.commerce-fx summary {
+    font:inherit;
+    cursor:pointer}
+.commerce-fx p {
+    margin:12px 0 0;
+    overflow-wrap:anywhere}
+
+@keyframes cart-count-arrival {
+    from {
+    transform:scale(.75)}
+65% {
+    transform:scale(1.15)}
+to {
+    transform:scale(1)}
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .cart-just-updated .cart-count-badge {
+    animation:none}
+}
+
+@media(max-width:1050px) {
+    .commerce-layout {
+    grid-template-columns:minmax(0,1fr) 310px;
+    gap:22px}
+.cart-line {
+    grid-template-columns:90px minmax(0,1fr);
+    gap:16px}
+.cart-update-form {
+    grid-template-columns:1fr 76px}
+.cart-update-form button {
+    grid-column:1/-1}
+}
+
+@media(max-width:800px) {
+    .commerce-layout {
+    grid-template-columns:minmax(0,1fr)}
+.commerce-summary {
+    position:static}
+.cart-line {
+    grid-template-columns:125px minmax(0,1fr)}
+.cart-update-form {
+    grid-template-columns:minmax(70px,1fr) 86px auto}
+.cart-update-form button {
+    grid-column:auto}
+}
+
+@media(max-width:480px) {
+    .commerce-panel,.commerce-summary,.cart-line {
+    padding:20px}
+.cart-line {
+    grid-template-columns:minmax(0,1fr);
+    gap:16px}
+.cart-piece-photo .photo-frame {
+    height:185px}
+.cart-update-form {
+    grid-template-columns:1fr 80px}
+.cart-update-form button {
+    grid-column:1/-1}
+.commerce-fields {
+    grid-template-columns:minmax(0,1fr)}
+.commerce-history-row {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:10px}
+.receipt-piece {
+    grid-template-columns:minmax(0,1fr)}
+.commerce-confirmation {
+    margin:32px 0}
+.commerce-panel h2,.commerce-summary h2 {
+    font-size:30px}
+.quote-price {
+    font-size:30px}
+}
+
+@media(max-width:400px) {
+    .header-account>.account-avatar-link>span:not(.profile-picture) {
+    display:none}
+}
+

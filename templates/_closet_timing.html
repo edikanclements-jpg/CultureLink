@@ -1,0 +1,15 @@
+{% macro timing_card(product) -%}
+<article class="closet-timing-card">
+    <h3>{{ product.product_name }}</h3>
+    <p>{{ product.boutique_name }}</p>
+    {% if product.timing %}
+    <dl>
+        <div><dt>Production</dt><dd>{{ product.timing.production_days }} days</dd></div>
+        <div><dt>Shipping</dt><dd>{{ product.timing.shipping_days }} days</dd></div>
+        <div class="timing-total"><dt>Total</dt><dd>{{ product.timing.total_days }} days</dd></div>
+    </dl>
+    {% else %}
+    <p class="timing-unknown">Confirm timing with the seller.</p>
+    {% endif %}
+</article>
+{%- endmacro %}

@@ -4,11 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover Indian and Nigerian clothing and the boutiques behind each piece.">
+    <meta name="description" content="Discover clothing across cultures and meet the boutiques behind each piece.">
     <title>{% block title %}CultureLink{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='discover.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='accounts.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='profiles.css', v='setup-motion-1') }}">
@@ -16,14 +13,14 @@
     <script src="{{ url_for('static', filename='ui.js') }}" defer></script>
     <script src="{{ url_for('static', filename='accounts.js', v='setup-motion-1') }}" defer></script>
     <script src="{{ url_for('static', filename='profiles.js', v='seller-full-submit-1') }}" defer></script>
-    <script src="{{ url_for('static', filename='closet.js', v='compare-1') }}" defer></script>
+    <script src="{{ url_for('static', filename='closet.js', v='saved-card-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='comparison.css', v='compare-1') }}">
-    <script src="{{ url_for('static', filename='comparison.js', v='compare-1') }}" defer></script>
+    <script src="{{ url_for('static', filename='comparison.js', v='closet-timing-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='outfits.css', v='outfits-2') }}">
     <script src="{{ url_for('static', filename='outfits.js', v='outfits-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='shopping.css', v='guide-1') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='instagram.css', v='verification-1') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='score-explainer.css', v='score-help-1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='score-explainer.css', v='score-compact-1') }}">
     <script src="{{ url_for('static', filename='score-explainer.js', v='score-help-1') }}" defer></script>
     <script src="{{ url_for('static', filename='shopping.js', v='guide-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='photo-layout.css', v='compact-photos-1') }}">
@@ -32,31 +29,60 @@
     <script src="{{ url_for('static', filename='profile-images.js', v='profile-pictures-1') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='seller-review.css', v='simulation-popup-1') }}">
     <script src="{{ url_for('static', filename='seller-review.js', v='simulation-popup-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='commerce.css',v='usd-cart-2') }}">
+    <script src="{{ url_for('static',filename='commerce.js',v='card-cart-1') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='culturelink.css', v='welcome-1') }}">
+    <script src="{{ url_for('static', filename='culturelink.js', v='welcome-1') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     {% set endpoint = request.endpoint or '' %}
     <header class="site-header">
-        <a class="brand-home" href="{{ url_for('main.home') }}" aria-label="CultureLink home"><img src="{{ url_for('static', filename='branding/culturelink-icon.png', v='brand-1') }}" alt="CultureLink" width="60" height="60"></a>
-        <nav aria-label="Main navigation">
-            <a href="{{ url_for('main.home') }}"{% if endpoint == 'main.home' %} aria-current="page"{% endif %}>Home</a>
-            <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') %} aria-current="page"{% endif %}>Discover</a>
-            <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
-            {% if g.user and g.user.role == 'customer' %}<a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') and endpoint not in ['closet.assistant','closet.assistant_reset'] %} aria-current="page"{% endif %}>Closet</a><a href="{{ url_for('closet.assistant') }}"{% if endpoint == 'closet.assistant' %} aria-current="page"{% endif %}>Guide</a>{% endif %}
-            {% if g.user and g.user.role == 'seller' %}<a href="{{ url_for('onboarding.seller.dashboard') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Studio</a>{% elif g.user and g.user.role == 'admin' %}<a href="{{ url_for('onboarding.seller.review_queue') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Reviews</a>{% endif %}
-        </nav>
+        <a class="brand-home" href="{{ url_for('main.home') }}" aria-label="CultureLink home">
+            <img src="{{ url_for('static', filename='branding/culturelink-icon.png', v='brand-1') }}" alt="" width="52" height="52">
+            <span>CultureLink</span>
+        </a>
         <div class="header-account">
+            {% if g.user and g.user.role == 'customer' %}{% set cart_count = shopping_cart_count() %}
+            <a class="cart-icon-link" data-cart-icon data-count-url="{{ url_for('products.shop.count') }}" href="{{ url_for('products.shop.cart') }}" title="Your cart" aria-label="Cart, {{ cart_count ~ (' piece' if cart_count == 1 else ' pieces') if cart_count is not none else 'count unavailable' }}"{% if endpoint.startswith('products.shop.') %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h2.2l2.1 12h11.7l2.3-8.5H5.3"/><circle cx="8.5" cy="20" r="1.2"/><circle cx="17.5" cy="20" r="1.2"/></svg><span class="cart-count-badge" data-cart-count aria-live="polite" aria-atomic="true">{{ cart_count if cart_count is not none else '?' }}</span></a>
+            {% endif %}
             {% if g.user %}
             {% set avatar_kind = 'avatar' if g.user.role == 'customer' else 'portrait' if account_photos.get('portrait') else 'logo' %}
-            <a class="account-avatar-link" href="{{ url_for('auth.account') }}"{% if endpoint == 'auth.account' %} aria-current="page"{% endif %} aria-label="My Account">{{ profile_picture(account_photos.get(avatar_kind), '', 'logo' if avatar_kind == 'logo' else 'avatar') }}<span>My Account</span></a>
-            <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="logout-button">Log Out</button>
-            </form>
-            {% else %}
-            <a href="{{ url_for('auth.login') }}"{% if endpoint == 'auth.login' %} aria-current="page"{% endif %}>Log In</a>
-            <a href="{{ url_for('auth.register') }}" class="account-create"{% if endpoint == 'auth.register' %} aria-current="page"{% endif %}>Create Account</a>
+            <a class="account-avatar-link" href="{{ url_for('auth.account') }}"{% if endpoint == 'auth.account' %} aria-current="page"{% endif %} aria-label="My Account" title="My Account">{{ profile_picture(account_photos.get(avatar_kind), '', 'logo' if avatar_kind == 'logo' else 'avatar') }}</a>
             {% endif %}
+            <details class="header-menu" data-site-menu>
+                <summary>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    Menu
+                </summary>
+                <nav aria-label="Main navigation" class="menu-links">
+                    <p class="menu-label">EXPLORE CULTURELINK</p>
+                    <a href="{{ url_for('main.home') }}"{% if endpoint == 'main.home' %} aria-current="page"{% endif %}>Home</a>
+                    <a href="{{ url_for('products.product_catalog') }}"{% if endpoint.startswith('products.') and not endpoint.startswith('products.shop.') %} aria-current="page"{% endif %}>Discover</a>
+                    <a href="{{ url_for('boutiques.boutique_directory') }}"{% if endpoint.startswith('boutiques.') %} aria-current="page"{% endif %}>Sellers</a>
+                    {% if g.user and g.user.role == 'customer' %}
+                    <p class="menu-label">YOUR SPACE</p>
+                    <a href="{{ url_for('closet.index') }}"{% if endpoint.startswith('closet.') and endpoint not in ['closet.assistant','closet.assistant_reset'] %} aria-current="page"{% endif %}>Closet</a>
+                    <a href="{{ url_for('closet.assistant') }}"{% if endpoint == 'closet.assistant' %} aria-current="page"{% endif %}>Shopping guide</a>
+                    <a href="{{ url_for('products.shop.orders') }}"{% if endpoint in ['products.shop.orders','products.shop.order','products.shop.quote'] %} aria-current="page"{% endif %}>Orders &amp; quotes</a>
+                    {% elif g.user and g.user.role == 'seller' %}
+                    <a href="{{ url_for('onboarding.seller.dashboard') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Seller studio</a>
+                    {% elif g.user and g.user.role == 'admin' %}
+                    <a href="{{ url_for('onboarding.seller.review_queue') }}"{% if endpoint.startswith('onboarding.seller.') %} aria-current="page"{% endif %}>Seller reviews</a>
+                    {% endif %}
+                    <div class="menu-account">
+                        {% if g.user %}
+                        <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="logout-button">Log out</button>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('auth.login') }}"{% if endpoint == 'auth.login' %} aria-current="page"{% endif %}>Log in</a>
+                        <a href="{{ url_for('auth.register') }}" class="menu-create"{% if endpoint == 'auth.register' %} aria-current="page"{% endif %}>Create account</a>
+                        {% endif %}
+                    </div>
+                </nav>
+            </details>
         </div>
     </header>
     <main id="main-content" class="page {% block page_class %}{% endblock %}">
@@ -73,8 +99,9 @@
     </main>
     <footer class="site-footer">
         <div><a class="footer-wordmark" href="{{ url_for('main.home') }}">CultureLink</a><p>Connecting cultures through fashion.</p></div>
-        <p class="hint">Student demonstration catalog. Confirm prices, sizing, and availability with each seller.</p>
+        <p class="hint">Student demonstration marketplace. Shopping, quotes and orders are simulated. No payments or shipments.</p>
     </footer>
     <div class="closet-toast" data-closet-feedback role="status" aria-live="polite" aria-atomic="true" hidden></div>
+    <div class="closet-toast cart-feedback" data-cart-feedback role="status" aria-live="polite" aria-atomic="true" hidden></div>
 </body>
 </html>

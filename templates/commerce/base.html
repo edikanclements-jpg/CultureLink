@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block page_class %}commerce-page{% endblock %}
+{% block content %}<div class="commerce-shell"><div class="commerce-topline"><span class="commerce-demo">DEMO SHOPPING</span><nav class="commerce-nav" aria-label="Shopping"><a href="{{ url_for('products.shop.cart') }}"{% if request.endpoint in ['products.shop.cart','products.shop.checkout'] %} aria-current="page"{% endif %}>Your cart</a><a href="{{ url_for('products.shop.orders') }}"{% if request.endpoint not in ['products.shop.cart','products.shop.checkout'] %} aria-current="page"{% endif %}>Orders &amp; quotes</a></nav></div>{% block shopping_content %}{% endblock %}</div>{% endblock %}

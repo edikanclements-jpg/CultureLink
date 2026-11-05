@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% from '_components.html' import product_card with context %}
+{% from '_closet_timing.html' import timing_card %}
 {% from 'outfits/_shared.html' import tabs %}
 {% block title %}Saved Closet | CultureLink{% endblock %}
 {% block page_class %}closet-page{% endblock %}
@@ -15,12 +16,21 @@
 <p class="closet-count" data-closet-count aria-live="polite"><strong>{{ products|length }}</strong> saved {{ 'piece' if products|length == 1 else 'pieces' }}</p>
 {% if compare_ids is not none %}
 <section class="compare-panel" aria-label="Compare your pieces" data-compare-panel data-selected="{{ compare_ids|tojson|forceescape }}">
-    <div><h2>Find your favorite.</h2><p id="compare-help">Choose 2 or 3 saved pieces to compare side by side.</p><p class="compare-selection-count" data-compare-count aria-live="polite">{{ compare_ids|length }} of 3 selected</p></div>
+    <div><p class="eyebrow">PLAN YOUR LOOK</p><h2>Compare timing</h2><p id="compare-help">Choose 2 or 3 saved pieces to see how long they take to make and ship.</p><p class="compare-selection-count" data-compare-count aria-live="polite">{{ compare_ids|length }} of 3 selected</p></div>
     <div class="compare-panel-actions"><form method="get" action="{{ url_for('closet.compare') }}"><button type="submit" data-compare-open{% if compare_ids|length < 2 %} disabled{% endif %}>Compare selected <span aria-hidden="true">&rarr;</span></button></form><form method="post" action="{{ url_for('closet.compare_clear') }}" data-compare-form data-compare-clear><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="compare-clear"{% if not compare_ids %} disabled{% endif %}>Clear selection</button></form></div>
+    <div class="closet-timing" data-closet-timing{% if timing_selection|length < 2 %} hidden{% endif %}>
+        <p>Sample estimates in business days.</p>
+        <div class="closet-timing-grid" data-timing-grid>
+            {% if timing_selection|length >= 2 %}{% for product in timing_selection %}{{ timing_card(product) }}{% endfor %}{% endif %}
+        </div>
+    </div>
 </section>
 {% else %}<p class="account-notice" role="status">Comparisons are temporarily unavailable. Your saved closet is still here.</p>{% endif %}
 <div class="product-grid closet-grid" data-closet-grid{% if not products %} hidden{% endif %}>
-    {% for product in products %}{{ product_card(product, closet_mode='remove') }}{% endfor %}
+    {% for product in products %}
+    {{ product_card(product, closet_mode='remove') }}
+    {% if compare_ids is not none %}<template data-timing-piece="{{ product.product_id }}">{{ timing_card(product) }}</template>{% endif %}
+    {% endfor %}
 </div>
 <div class="closet-empty" data-closet-empty{% if products %} hidden{% endif %}>
     <span class="closet-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.4 5.6a5 5 0 0 0-7.1 0L12 6.9l-1.3-1.3a5 5 0 0 0-7.1 7.1L12 21l8.4-8.3a5 5 0 0 0 0-7.1Z"/></svg></span>

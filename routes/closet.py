@@ -95,7 +95,12 @@ def index():
     except Error:
         current_app.logger.warning("Could not read comparisonselections for the current buyer.")
         selected = None
-    return render_template("closet.html", products=products, problem=None, compare_ids=selected)
+    saved_by_id = {product["product_id"]: product for product in products}
+    if selected is not None:
+        selected = [identifier for identifier in selected if identifier in saved_by_id]
+    timing_selection = [saved_by_id[identifier] for identifier in selected or ()]
+    return render_template("closet.html", products=products, problem=None,
+                           compare_ids=selected, timing_selection=timing_selection)
 
 
 def _change(product_id, saved):

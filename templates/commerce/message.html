@@ -1,0 +1,3 @@
+{% extends 'commerce/base.html' %}
+{% block title %}Shopping Update | CultureLink{% endblock %}
+{% block shopping_content %}<section class="commerce-panel commerce-message"><p class="eyebrow">YOUR SHOPPING UPDATE</p><h1>Let's take another look.</h1><p role="alert">{{ message }}</p><div class="detail-actions"><a class="button" href="{{ url_for('products.shop.cart') }}">Open your cart</a><a class="button secondary-button" href="{{ url_for('products.product_catalog') }}">Discover pieces</a></div></section>{% endblock %}

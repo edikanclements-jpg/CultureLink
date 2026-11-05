@@ -7,6 +7,7 @@ from database import get_db_connection
 from services.catalog_rules import canonical_size, has_custom_size, seller_location, SELLER_LOCATION_SQL
 from services.seller_timing import timing_for
 from services.seller_review_schema import PUBLIC_SELLER_SQL
+from services.catalog_expansion import ensure_catalog
 
 
 INR_PATTERN = r"(^|[^A-Z])INR([^A-Z]|$)"
@@ -95,6 +96,7 @@ def format_product(product):
 
 def _fetch_products(where="", parameters=()):
     """Use Akhil's joins for the homepage, one item, or one seller."""
+    ensure_catalog()
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     try:

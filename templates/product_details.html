@@ -19,12 +19,17 @@
             <div><dt>Seller location</dt><dd>{{ product.seller_location or 'Not provided' }}</dd></div>
         </dl>
         {% if product.custom_size %}<p class="hint">Custom sizing and final pricing will be confirmed together.</p>{% endif %}
+        {% set shop_options = purchase_options(product) %}
+        <section class="purchase-panel" aria-labelledby="purchase-heading"><p class="eyebrow">SHOP THROUGH CULTURELINK</p><h2 id="purchase-heading">{{ 'Made for you.' if shop_options.requires_quote else 'Make it your next look.' }}</h2>
+        {% if g.user and g.user.role == 'customer' %}
+        {% if shop_options.requires_quote %}<a class="button" href="{{ url_for('products.shop.quote_new',product_id=product.product_id) }}">Request a custom quote <span aria-hidden="true">→</span></a><p class="hint">Share your measurements, then review a sample price before adding this piece to the cart.</p>
+        {% else %}<form method="post" action="{{ url_for('products.shop.add',product_id=product.product_id) }}" class="purchase-fields" data-cart-add><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div><label for="purchase-size">Choose size</label><select id="purchase-size" name="size" required><option value="">Select a size</option>{% for size in shop_options.sizes %}<option value="{{ size }}">{{ size }}</option>{% endfor %}</select></div><button type="submit">Add to cart <span aria-hidden="true">+</span></button></form><a class="text-link" data-cart-next href="{{ url_for('products.shop.cart') }}" hidden>View your cart <span aria-hidden="true">→</span></a>{% endif %}
+        {% elif not g.user %}<a class="button" href="{{ url_for('auth.login') }}">Log in to shop <span aria-hidden="true">→</span></a>{% elif g.user.role == 'pending' %}<a class="button" href="{{ url_for('onboarding.choose_role') }}">Finish buyer setup <span aria-hidden="true">→</span></a>{% else %}<p class="hint">Use a buyer account to add pieces or request custom quotes.</p>{% endif %}
+        <p class="hint">Classroom simulation. No real payment, email, or shipment.</p></section>
         <div class="detail-actions">
             {{ closet_control(product) }}
             <a class="button" href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">View seller <span aria-hidden="true">→</span></a>
-            {% if product.storefront_url %}<a class="button secondary-button" href="{{ product.storefront_url }}" target="_blank" rel="noopener noreferrer">Open storefront <span aria-hidden="true">↗</span></a>{% endif %}
         </div>
-        {% if not product.storefront_url %}<p class="hint muted">A storefront link has not been provided for this piece.</p>{% endif %}
         <details class="info-accordion" open><summary>About this piece</summary><p>{{ product.description or 'A description has not been provided.' }}</p></details>
         <details class="info-accordion" data-product-delivery><summary>Fit &amp; delivery{% if product.timing %} · Sample timing{% endif %}</summary>{% if product.timing %}{{ timing_panel(product.timing, 'h3') }}{% endif %}<p>Confirm actual sizing, alterations, production and shipping before ordering. Sample timing is not a delivery promise.</p></details>
         {% if product.price_notes %}<details class="info-accordion"><summary>Price information</summary><p>{{ product.price_notes }}</p></details>{% endif %}

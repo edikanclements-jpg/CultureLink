@@ -9,27 +9,15 @@
     </summary>
     <div class="score-explainer-panel" id="{{ help_id }}" role="region" aria-labelledby="{{ help_id }}-heading" data-score-panel>
         <div class="score-explainer-top">
-            <div><p class="score-explainer-eyebrow">HOW THE SCORE WORKS</p><h3 id="{{ help_id }}-heading">{{ boutique.boutique_name }}</h3></div>
+            <h3 id="{{ help_id }}-heading">Evidence score</h3>
             <button type="button" class="score-explainer-close" data-score-close aria-label="Close score explanation"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button>
         </div>
-        <p class="score-explainer-intro"><strong>{{ score }}/100</strong> · Ten checks, worth 10 points each. Documented evidence earns 10; an unconfirmed check earns 0.</p>
         {% if evidence %}
-        <div class="score-explainer-categories">
-            {% for category in evidence.categories %}
-            <section class="score-explainer-category" aria-label="{{ category.label }}">
-                <div class="score-explainer-category-heading"><h4>{{ category.label }}</h4><strong>{{ category.score }}/20</strong></div>
-                <ul>{% for check in category.checks %}<li><span>{{ check.label }}</span><span>{{ check.points }}/10</span></li>{% endfor %}</ul>
-            </section>
-            {% endfor %}
-        </div>
-        {% else %}<p>Public evidence has not been confirmed for this seller.</p>{% endif %}
-        <div class="score-explainer-notes">
-            <p>Complete listings include a name, description and image reference. Post counts are cumulative, not recent engagement. Follower totals earn no points.</p>
-            <p>Policy points mean terms are disclosed, including no-refund policies. Unconfirmed means unknown. This score measures documentation; it does not guarantee genuine engagement, sales or a safe purchase.</p>
-            <p class="score-explainer-tiers">80–100: Well documented · 50–79: Partly documented · 0–49: Limited evidence</p>
-            {% if evidence and evidence.reviewed_on %}<p>Public sources reviewed {{ evidence.reviewed_on }}{% if evidence.review_due %} · Review due{% endif %}. Reviews are due after 90 days; external facts are not a live feed.</p>{% endif %}
-        </div>
-        <a class="score-explainer-more" href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}#seller-verification"{% if variant == 'detail' %} data-score-show-sources{% endif %}>See full checks and sources <span aria-hidden="true">→</span></a>
+        <p class="score-explainer-intro"><strong>{{ evidence.documented_checks }} of {{ evidence.total_checks }} checks documented.</strong> Each earns 10 points.</p>
+        {% else %}
+        <p class="score-explainer-intro">Public evidence has not been confirmed for this seller.</p>
+        {% endif %}
+        <a class="score-explainer-more" href="{{ url_for('boutiques.boutique_details', boutique_id=boutique.boutique_id) }}#seller-verification"{% if variant == 'detail' %} data-score-show-sources{% endif %}>See checks &amp; sources <span aria-hidden="true">→</span></a>
     </div>
 </details>
 {%- endmacro %}

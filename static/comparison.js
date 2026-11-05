@@ -11,7 +11,20 @@
         const status = document.querySelector('[data-closet-feedback]');
         if (status) { status.textContent = message; status.hidden = false; }
     };
+    const timing = panel?.querySelector('[data-closet-timing]');
+    const timingGrid = timing?.querySelector('[data-timing-grid]');
+    let lastTimingKey = selected.join(',');
+    const renderTiming = () => {
+        const key = selected.join(',');
+        if (!timingGrid || key === lastTimingKey) return;
+        lastTimingKey = key;
+        const cards = selected.map(id => document.querySelector('template[data-timing-piece="' + id + '"]'))
+            .filter(Boolean).map(template => template.content.cloneNode(true));
+        timing.hidden = cards.length < 2;
+        timingGrid.replaceChildren(...(timing.hidden ? [] : cards));
+    };
     const render = () => {
+        renderTiming();
         document.querySelectorAll('[data-compare-toggle]').forEach(button => {
             const form = button.form;
             const chosen = selected.includes(Number(form.dataset.productId));

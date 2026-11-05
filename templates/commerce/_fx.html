@@ -1,0 +1,3 @@
+{% macro fx_note(fx) -%}
+{% if fx %}<details class="commerce-fx"><summary>USD conversion · {{ fx.label }}</summary><p>Saved reference rate: 1 INR ≈ {{ '%.8f'|format(fx.usd_per_inr|float) }} USD. Converted unit prices are rounded to cents, then multiplied by quantity.</p><p>Source: <a href="{{ fx.source_url }}" target="_blank" rel="noopener noreferrer">{{ fx.source }}</a>, {{ fx.label }}. This is an estimate for the demo, using a saved rate rather than a live payment rate.</p></details>{% endif %}
+{%- endmacro %}

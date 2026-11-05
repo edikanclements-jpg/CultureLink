@@ -12,7 +12,7 @@
     <div class="auth-card">
         <p class="eyebrow">YOUR CULTURELINK ACCOUNT</p>
         <h2>Good to see you again.</h2>
-        <p class="auth-lead">Log in with your email and password.</p>
+        <p class="auth-lead">{{ 'Log in to continue with this piece.' if shop_piece else 'Log in with your email and password.' }}</p>
         {% if errors %}
         <div class="auth-errors" role="alert" tabindex="-1">
             {% for message in errors.values() %}<p>{{ message }}</p>{% endfor %}
@@ -20,6 +20,10 @@
         {% endif %}
         <form action="{{ url_for('auth.login') }}" method="post" class="auth-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if shop_piece %}
+            <input type="hidden" name="shop_piece" value="{{ shop_piece }}">
+            <input type="hidden" name="shop_action" value="{{ shop_action }}">
+            {% endif %}
             <div class="field">
                 <label for="login-email">Email address</label>
                 <input type="email" id="login-email" name="email" value="{{ email }}" autocomplete="username" inputmode="email" maxlength="150" required>

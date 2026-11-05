@@ -13,6 +13,7 @@
         {% if account_type == 'buyer' %}<a class="text-link account-closet-link" href="{{ url_for('closet.index') }}">Open my saved closet <span aria-hidden="true">&rarr;</span></a>{% endif %}
         {% if account_type == 'buyer' %}<a class="text-link account-closet-link" href="{{ url_for('closet.outfits') }}">Plan an outfit <span aria-hidden="true">&rarr;</span></a>{% endif %}
         {% if account_type == 'buyer' %}<a class="text-link account-closet-link" href="{{ url_for('closet.assistant') }}">Ask the shopping guide <span aria-hidden="true">&rarr;</span></a>{% endif %}
+        {% if account_type == 'buyer' %}<a class="text-link account-closet-link" href="{{ url_for('products.shop.cart') }}">Open my cart <span aria-hidden="true">→</span></a><a class="text-link account-closet-link" href="{{ url_for('products.shop.orders') }}">My orders &amp; quotes <span aria-hidden="true">→</span></a>{% endif %}
     </div>
     <div class="auth-card account-details">
         <div class="account-identity">

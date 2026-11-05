@@ -188,8 +188,24 @@ def register():
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
+    # Return to the specific shopping step after login. The only destinations
+    # are these two local routes, and the quote route still checks buyer access.
+    values = request.form if request.method == "POST" else request.args
+    shop_piece = values.get("shop_piece", "")
+    shop_action = values.get("shop_action", "")
+    if (not re.fullmatch(r"[1-9][0-9]{0,9}", shop_piece) or int(shop_piece) > 4294967295
+            or shop_action not in {"buy", "quote"}):
+        shop_piece = shop_action = ""
+
+    def destination(user):
+        if shop_piece and user["role"] == "customer":
+            if shop_action == "quote":
+                return url_for("products.shop.quote_new", product_id=int(shop_piece))
+            return url_for("products.product_details", product_id=int(shop_piece), _anchor="purchase-heading")
+        return url_for("auth.account")
+
     if g.user is not None:
-        return redirect(url_for("auth.account"))
+        return redirect(destination(g.user))
     errors = {}
     email = ""
     status = 200
@@ -224,10 +240,11 @@ def login():
                         ("login-email", request.remote_addr or "local", email)
                     )
                     flash("You're logged in.", "success")
-                    return redirect(url_for("auth.account"))
+                    return redirect(destination(user))
         if errors and status == 200:
             status = 400
-    return render_template("auth/login.html", email=email, errors=errors), status
+    return render_template("auth/login.html", email=email, errors=errors,
+                           shop_piece=shop_piece, shop_action=shop_action), status
 
 
 @auth_bp.route("/account")

@@ -3,7 +3,7 @@
 {% macro product_image(product, eager=false) -%}
 <div class="photo-frame">
     {% if product and product.image_url %}
-    <img src="{{ product.image_url if product.image_url.startswith('https://') or product.image_url.startswith('http://') or product.image_url.startswith('/seller/items/') else url_for('static', filename='images/' ~ product.image_url) }}"
+    <img src="{{ product.image_url if product.image_url.startswith('https://') or product.image_url.startswith('http://') or product.image_url.startswith('/seller/items/') or product.image_url.startswith('/static/catalog/nigerian/') else url_for('static', filename='images/' ~ product.image_url) }}"
          alt="{{ product.product_name }}" loading="{{ 'eager' if eager else 'lazy' }}"
          onerror="this.hidden=true;this.parentElement.querySelector('.image-placeholder').hidden=false;">
     {% endif %}
@@ -17,33 +17,67 @@
 <form method="post" action="{{ url_for('closet.remove' if saved or mode == 'remove' else 'closet.save', product_id=product.product_id) }}" class="closet-control" data-closet-form data-product-id="{{ product.product_id }}" data-product-name="{{ product.product_name }}" data-closet-mode="{{ mode }}" data-save-url="{{ url_for('closet.save', product_id=product.product_id) }}" data-remove-url="{{ url_for('closet.remove', product_id=product.product_id) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="return_to" value="{{ closet_return_to }}#piece-{{ product.product_id }}">
-    <button type="submit" class="closet-button{% if saved %} is-saved{% endif %}" data-closet-button aria-label="{{ 'Remove ' ~ product.product_name ~ ' from your closet' if mode == 'remove' else 'Save ' ~ product.product_name ~ ' to your closet' }}"{% if mode != 'remove' %} aria-pressed="{{ 'true' if saved else 'false' }}"{% endif %}{% if saved is none %} disabled{% endif %}>
+    <button type="submit" class="closet-button{% if saved %} is-saved{% endif %}" data-closet-button{% if mode == 'remove' %} title="Remove from closet"{% endif %} aria-label="{{ 'Remove ' ~ product.product_name ~ ' from your closet' if mode == 'remove' else 'Save ' ~ product.product_name ~ ' to your closet' }}"{% if mode != 'remove' %} aria-pressed="{{ 'true' if saved else 'false' }}"{% endif %}{% if saved is none %} disabled{% endif %}>
         {% if mode == 'remove' %}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>{% else %}<svg class="closet-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 5.6a5 5 0 0 0-7.1 0L12 6.9l-1.3-1.3a5 5 0 0 0-7.1 7.1L12 21l8.4-8.3a5 5 0 0 0 0-7.1Z"/></svg>{% endif %}
-        <span data-closet-label>{{ 'Closet unavailable' if saved is none else 'Remove' if mode == 'remove' else 'Saved' if saved else 'Save' }}</span>
+        <span data-closet-label>{{ 'Closet unavailable' if saved is none else 'Saved' if saved or mode == 'remove' else 'Save' }}</span>
     </button>
 </form>
 {% elif not g.user %}
-<a class="closet-login" href="{{ url_for('auth.login') }}" aria-label="Log in to save {{ product.product_name }}">Log in to save <span aria-hidden="true">♡</span></a>
+<a class="closet-login" href="{{ url_for('auth.login') }}" aria-label="Log in to save {{ product.product_name }}"><span aria-hidden="true">♡</span> Save</a>
 {% elif g.user.role == 'pending' %}
-<a class="closet-login" href="{{ url_for('onboarding.choose_role') }}">Finish setup to save</a>
+<a class="closet-login" href="{{ url_for('onboarding.choose_role') }}" aria-label="Finish setup to save {{ product.product_name }}">Save</a>
 {% endif %}
 {%- endmacro %}
 
-{% macro product_card(product, heading='h2', closet_mode='toggle', compact=false) -%}
-<article class="product-card{% if compact %} product-card--preview{% endif %}" id="piece-{{ product.product_id }}" data-product-id="{{ product.product_id }}" data-seller-id="{{ product.boutique_id }}">
+{% macro card_add_to_cart(product, instance) -%}
+{% set options = purchase_options(product) %}
+{% if not g.user %}
+<a class="button card-add-button" href="{{ url_for('auth.login', shop_piece=product.product_id, shop_action='quote' if options.requires_quote else 'buy') }}" aria-label="Log in to add {{ product.product_name }} to cart">Add to cart</a>
+{% elif g.user.role == 'pending' %}
+<a class="button card-add-button" href="{{ url_for('onboarding.choose_role') }}" aria-label="Finish buyer setup to add {{ product.product_name }} to cart">Add to cart</a>
+{% elif g.user.role == 'customer' %}
+{% if options.requires_quote %}
+<a class="button card-add-button" href="{{ url_for('products.shop.quote_new', product_id=product.product_id) }}" aria-label="Add to cart: request a quote for {{ product.product_name }}" title="Opens a custom quote request">Add to cart</a>
+{% elif options.sizes|length == 1 %}
+<form method="post" action="{{ url_for('products.shop.add', product_id=product.product_id) }}" data-cart-add>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="size" value="{{ options.sizes[0] }}">
+    <button type="submit" class="card-add-button" aria-label="Add {{ product.product_name }} to cart">Add to cart</button>
+</form>
+{% else %}
+<details class="card-size-picker">
+    <summary class="button card-add-button" aria-label="Add to cart: choose a size for {{ product.product_name }}">Add to cart</summary>
+    <form method="post" action="{{ url_for('products.shop.add', product_id=product.product_id) }}" data-cart-add>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="card-size-{{ instance }}">Choose a size</label>
+        <select id="card-size-{{ instance }}" name="size" required>
+            <option value="">Select a size</option>
+            {% for size in options.sizes %}<option value="{{ size }}">{{ size }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="card-add-button">Add selected size</button>
+    </form>
+</details>
+{% endif %}
+{% endif %}
+{%- endmacro %}
+
+{% macro product_card(product, heading='h2', closet_mode='toggle') -%}
+<article class="product-card" id="piece-{{ product.product_id }}" data-product-id="{{ product.product_id }}" data-seller-id="{{ product.boutique_id }}">
     <a class="photo-link" href="{{ url_for('products.product_details', product_id=product.product_id) }}" aria-label="View {{ product.product_name }}">{{ product_image(product) }}</a>
     <div class="product-info">
         <p class="culture-tag">{{ product.culture }}</p>
-        <{{ heading }} class="product-title"><a href="{{ url_for('products.product_details', product_id=product.product_id) }}">{{ product.product_name }}</a></{{ heading }}>
+        <{{ heading }} class="product-title">{{ product.product_name }}</{{ heading }}>
         <p class="seller">By <a href="{{ url_for('boutiques.boutique_details', boutique_id=product.boutique_id) }}">{{ product.boutique_name }}</a></p>
         <p class="price">{{ product.display_price }}</p>
-        {% if not compact %}<dl>
+        <dl>
             <div><dt>Occasion</dt><dd>{{ product.occasion or 'Not provided' }}</dd></div>
             <div><dt>Color</dt><dd>{{ product.color or 'Not provided' }}</dd></div>
             <div><dt>Size</dt><dd>{{ product.display_size }}</dd></div>
             <div><dt>Location</dt><dd>{{ product.seller_location or 'Not provided' }}</dd></div>
-        </dl>{% endif %}
-        <div class="piece-card-actions"><a class="text-link" href="{{ url_for('products.product_details', product_id=product.product_id) }}">View piece <span aria-hidden="true">→</span></a>{{ closet_control(product, mode=closet_mode) }}</div>
+        </dl>
+        {% if not g.user or g.user.role in ['pending', 'customer'] %}
+        <div class="piece-card-actions">{{ closet_control(product, mode=closet_mode) }}{{ card_add_to_cart(product, product.product_id) }}</div>
+        {% endif %}
         {% if closet_mode == 'remove' and compare_ids is defined and compare_ids is not none %}
         {% set chosen = product.product_id in compare_ids %}
         <form class="compare-card-form" method="post" action="{{ url_for('closet.compare_remove' if chosen else 'closet.compare_add', product_id=product.product_id) }}" data-compare-form data-product-id="{{ product.product_id }}" data-add-url="{{ url_for('closet.compare_add', product_id=product.product_id) }}" data-remove-url="{{ url_for('closet.compare_remove', product_id=product.product_id) }}">

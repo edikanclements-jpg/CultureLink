@@ -9,9 +9,7 @@
     <div class="seller-profile-header">
         <div class="seller-identity">{{ profile_picture(boutique.pictures.get('logo'), boutique.boutique_name ~ ' logo', 'logo', boutique.initials) }}<div><p class="eyebrow">{{ boutique.cultures|join(' · ') or 'CULTURELINK BOUTIQUE' }}</p><h1 id="seller-heading">{{ boutique.boutique_name }}</h1><p class="seller-profile-location">{{ boutique.location or 'Location not provided' }}</p></div></div>
         <div class="seller-profile-actions">
-            {% if boutique.website_url %}<a class="button secondary-button" href="{{ boutique.website_url }}" target="_blank" rel="noopener noreferrer">Visit website <span aria-hidden="true">↗</span></a>{% endif %}
-            {% if boutique.social_url %}<a class="button secondary-button" href="{{ boutique.social_url }}" target="_blank" rel="noopener noreferrer">Visit social page <span aria-hidden="true">↗</span></a>{% endif %}
-            {% if not boutique.website_url and not boutique.social_url %}<p class="hint muted">Storefront link not provided.</p>{% endif %}
+            <a class="button secondary-button" href="#collection-heading">Shop this collection <span aria-hidden="true">↓</span></a>
         </div>
     </div>
     {% if boutique.description %}<p class="seller-description">{{ boutique.description }}</p>{% endif %}
